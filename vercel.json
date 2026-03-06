@@ -1,27 +1,13 @@
 {
-  "version": 2,
   "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
+    { "src": "api/stats_index.py", "use": "@vercel/python" }
   ],
   "routes": [
-    {
-      "src": "/api",
-      "dest": "/api/index.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/stats", "dest": "/api/stats_index.py" },
+    { "src": "/streak", "dest": "/api/stats_index.py" },
+    { "src": "/graph", "dest": "/api/stats_index.py" },
+    { "src": "/views", "dest": "/api/stats_index.py" },
+    { "src": "/themes", "dest": "/api/stats_index.py" },
+    { "src": "/(.*)", "dest": "/api/stats_index.py" }
   ]
 }
