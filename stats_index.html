@@ -7,7 +7,7 @@
   <style>
     :root { color-scheme: dark; }
     body { margin: 0; font-family: Inter, Arial, sans-serif; background: #0b1020; color: #e6ecff; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 18px 40px; }
+    .wrap { max-width: 1050px; margin: 0 auto; padding: 28px 18px 40px; }
     h1 { margin: 0 0 8px; font-size: 30px; }
     p { margin: 0 0 18px; color: #b8c3dd; }
     .card { background: #121a30; border: 1px solid #26314d; border-radius: 14px; padding: 18px; margin-top: 14px; }
@@ -16,71 +16,68 @@
     @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
     label { display: block; font-size: 12px; margin-bottom: 6px; color: #91a0bf; }
     input, select { width: 100%; box-sizing: border-box; border-radius: 10px; border: 1px solid #314062; background: #0f1730; color: #e6ecff; padding: 10px; }
-    .checks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; }
+    input[type="color"] { padding: 4px; height: 40px; }
+    .checks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; }
     .checks label { display: flex; gap: 8px; align-items: center; margin: 0; font-size: 13px; color: #c7d3f0; }
-    .preview { min-height: 90px; display: flex; align-items: center; justify-content: center; border: 1px dashed #3a4d78; border-radius: 10px; background: #0d1427; }
+    .preview { min-height: 95px; display: flex; align-items: center; justify-content: center; border: 1px dashed #3a4d78; border-radius: 10px; background: #0d1427; }
     .actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
     button { border: none; border-radius: 10px; background: #4f7cff; color: white; padding: 10px 14px; font-weight: 600; cursor: pointer; }
     button.alt { background: #273556; }
     code { background: #0a1228; border: 1px solid #2a3a60; padding: 2px 6px; border-radius: 6px; }
     textarea { width: 100%; min-height: 74px; resize: vertical; border: 1px solid #314062; background: #0f1730; color: #dbe7ff; border-radius: 10px; padding: 10px; box-sizing: border-box; }
+    .color-wrap { display: grid; grid-template-columns: 1fr 48px; gap: 8px; }
+    .palette { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .swatch {
+      width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+      border: 2px solid #273556; box-sizing: border-box;
+    }
+    .swatch:hover { border-color: #dbe7ff; }
+    .palette-row { margin-top: 12px; }
+    .palette-row small { color: #9db0d7; display: block; margin-bottom: 6px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Custom Badge Generator</h1>
-    <p>Настраивай всё: текст, стиль, тему, цвета, пресеты и формат markdown.</p>
+    <p>Настраивай всё: текст, стиль, тему, цвета, размер, пресеты и формат markdown.</p>
 
     <div class="card">
       <div class="grid">
+        <div><label>Preset</label><select id="preset"></select></div>
+        <div><label>Style</label><select id="style"></select></div>
+        <div><label>Theme</label><select id="theme"></select></div>
+        <div><label>Icon</label><select id="icon"></select></div>
+        <div><label>Label</label><input id="label" value="build" /></div>
+        <div><label>Value</label><input id="value" value="passing" /></div>
+        <div><label>Size</label><select id="size"></select></div>
+        <div><label>Scale (0.7..2)</label><input id="scale" type="number" min="0.7" max="2" step="0.05" value="1" /></div>
+        <div><label>Border Radius</label><input id="border_radius" type="number" min="0" max="999" value="4" /></div>
+
         <div>
-          <label>Preset</label>
-          <select id="preset"></select>
+          <label>Label BG</label>
+          <div class="color-wrap"><input id="label_bg" placeholder="#1f2937" /><input id="label_bg_picker" type="color" value="#1f2937" /></div>
         </div>
         <div>
-          <label>Style</label>
-          <select id="style"></select>
+          <label>Value BG</label>
+          <div class="color-wrap"><input id="value_bg" placeholder="#111827" /><input id="value_bg_picker" type="color" value="#111827" /></div>
         </div>
         <div>
-          <label>Theme</label>
-          <select id="theme"></select>
+          <label>Label Color</label>
+          <div class="color-wrap"><input id="label_color" placeholder="#f3f4f6" /><input id="label_color_picker" type="color" value="#f3f4f6" /></div>
         </div>
         <div>
-          <label>Icon</label>
-          <select id="icon"></select>
+          <label>Value Color</label>
+          <div class="color-wrap"><input id="value_color" placeholder="#93c5fd" /><input id="value_color_picker" type="color" value="#93c5fd" /></div>
         </div>
         <div>
-          <label>Label</label>
-          <input id="label" value="build" />
+          <label>Border Color</label>
+          <div class="color-wrap"><input id="border_color" placeholder="#374151" /><input id="border_color_picker" type="color" value="#374151" /></div>
         </div>
-        <div>
-          <label>Value</label>
-          <input id="value" value="passing" />
-        </div>
-        <div>
-          <label>Label BG (hex)</label>
-          <input id="label_bg" placeholder="#1f2937" />
-        </div>
-        <div>
-          <label>Value BG (hex)</label>
-          <input id="value_bg" placeholder="#111827" />
-        </div>
-        <div>
-          <label>Label Color (hex)</label>
-          <input id="label_color" placeholder="#f3f4f6" />
-        </div>
-        <div>
-          <label>Value Color (hex)</label>
-          <input id="value_color" placeholder="#93c5fd" />
-        </div>
-        <div>
-          <label>Border Color (hex)</label>
-          <input id="border_color" placeholder="#374151" />
-        </div>
-        <div>
-          <label>Border Radius</label>
-          <input id="border_radius" type="number" min="0" max="18" value="4" />
-        </div>
+      </div>
+
+      <div class="palette-row">
+        <small>Palette for all color fields</small>
+        <div class="palette" id="palette"></div>
       </div>
 
       <div class="checks">
@@ -107,11 +104,28 @@
   </div>
 
   <script>
-    const ids = ["preset","style","theme","icon","label","value","label_bg","value_bg","label_color","value_color","border_color","border_radius","gradient","uppercase","compact"];
+    const ids = ["preset","style","theme","icon","label","value","size","scale","label_bg","value_bg","label_color","value_color","border_color","border_radius","gradient","uppercase","compact"];
     const input = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+    const pickers = {
+      label_bg: document.getElementById("label_bg_picker"),
+      value_bg: document.getElementById("value_bg_picker"),
+      label_color: document.getElementById("label_color_picker"),
+      value_color: document.getElementById("value_color_picker"),
+      border_color: document.getElementById("border_color_picker")
+    };
     const preview = document.getElementById("preview");
     const urlBox = document.getElementById("url");
     const mdBox = document.getElementById("markdown");
+
+    const colorFields = Object.keys(pickers);
+    let activeColorField = "label_bg";
+
+    const syncInputWithPicker = (field) => {
+      const val = input[field].value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        pickers[field].value = val;
+      }
+    };
 
     const buildQuery = () => {
       const q = new URLSearchParams();
@@ -133,17 +147,29 @@
       mdBox.value = `![custom badge](${badgeUrl})`;
     };
 
-    const copyText = async (text) => {
-      await navigator.clipboard.writeText(text);
-    };
+    const copyText = async (text) => navigator.clipboard.writeText(text);
 
     document.getElementById("render").addEventListener("click", render);
     document.getElementById("copy-url").addEventListener("click", async () => copyText(urlBox.value));
     document.getElementById("copy-md").addEventListener("click", async () => copyText(mdBox.value));
 
     ids.forEach(id => input[id].addEventListener("change", render));
-    ["label","value","label_bg","value_bg","label_color","value_color","border_color","border_radius"].forEach(id => {
-      input[id].addEventListener("input", render);
+    ["label","value","scale","border_radius", ...colorFields].forEach(id => {
+      input[id].addEventListener("input", () => {
+        if (colorFields.includes(id)) syncInputWithPicker(id);
+        render();
+      });
+      if (colorFields.includes(id)) {
+        input[id].addEventListener("focus", () => { activeColorField = id; });
+      }
+    });
+
+    Object.entries(pickers).forEach(([field, picker]) => {
+      picker.addEventListener("input", () => {
+        input[field].value = picker.value;
+        render();
+      });
+      picker.addEventListener("focus", () => { activeColorField = field; });
     });
 
     fetch("/catalog")
@@ -153,7 +179,23 @@
         appendOptions(input.style, catalog.styles);
         appendOptions(input.theme, catalog.themes);
         appendOptions(input.icon, catalog.icons);
+        appendOptions(input.size, catalog.sizes);
         appendOptions(input.preset, Object.keys(catalog.presets));
+
+        const paletteEl = document.getElementById("palette");
+        (catalog.palette || []).forEach(color => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "swatch";
+          btn.style.background = color;
+          btn.title = `${color} → ${activeColorField}`;
+          btn.addEventListener("click", () => {
+            input[activeColorField].value = color;
+            pickers[activeColorField].value = color;
+            render();
+          });
+          paletteEl.appendChild(btn);
+        });
 
         input.preset.addEventListener("change", () => {
           const p = catalog.presets[input.preset.value];
@@ -163,6 +205,7 @@
           input.icon.value = p.icon;
           input.theme.value = p.theme;
           input.style.value = p.style;
+          input.size.value = p.size || "md";
           render();
         });
 
@@ -170,6 +213,8 @@
         input.style.value = "flat";
         input.theme.value = "terminal";
         input.icon.value = "check";
+        input.size.value = "md";
+        colorFields.forEach(syncInputWithPicker);
         render();
       })
       .catch(() => {

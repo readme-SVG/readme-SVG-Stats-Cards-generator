@@ -1,15 +1,15 @@
 # README Custom Badge Generator
 
-Serverless генератор SVG-баджей для README, профилей GitHub и документации. Проект полностью сфокусирован на одной задаче: делать максимально кастомизируемые баджи через URL-параметры.
+Serverless генератор SVG-баджей для README, профилей GitHub и документации с упором на максимальную кастомизацию.
 
 ## Что умеет
 
 - Генерирует баджи через endpoint `/badge`.
-- Поддерживает стили: `flat`, `flat-square`, `for-the-badge`, `plastic`, `social`.
+- Поддерживает стили: `flat`, `flat-square`, `for-the-badge`, `plastic`, `social`, `rounded`, `pill`, `outline`, `soft`.
+- Поддерживает размеры: `xs`, `sm`, `md`, `lg`, `xl` + точная настройка через `scale`.
 - Поддерживает темы: `dark`, `light`, `neon`, `sunset`, `terminal`.
-- Кастомизирует текст, иконку, цвета, радиус, uppercase, compact-режим, plastic-градиент.
+- Дает выбор цветов через палитру в UI, color picker и ручной HEX.
 - Имеет пресеты и каталог возможностей через `/catalog`.
-- Содержит web playground на `/` для live-просмотра и копирования Markdown.
 
 ## Быстрый старт
 
@@ -19,7 +19,7 @@ cd readme-SVG-Stats-Cards-generator
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python api/stats_index.py
+python3 api/stats_index.py
 ```
 
 Откройте `http://127.0.0.1:5000`.
@@ -33,11 +33,13 @@ python api/stats_index.py
 - `label` — левая часть (`build`)
 - `value` — правая часть (`passing`)
 - `icon` — `star|heart|check|fire|bolt|rocket|code|build|docs|none`
-- `style` — `flat|flat-square|for-the-badge|plastic|social`
+- `style` — `flat|flat-square|for-the-badge|plastic|social|rounded|pill|outline|soft`
+- `size` — `xs|sm|md|lg|xl`
+- `scale` — float `0.7..2.0`
 - `theme` — `dark|light|neon|sunset|terminal`
-- `label_bg`, `value_bg`, `label_color`, `value_color`, `border_color` — HEX, например `#111827`
-- `border_radius` — `0..18`
-- `gradient` — `true|false` (актуально для `plastic`)
+- `label_bg`, `value_bg`, `label_color`, `value_color`, `border_color` — HEX
+- `border_radius` — `0..999`
+- `gradient` — `true|false` (для `plastic`)
 - `uppercase` — `true|false`
 - `compact` — `true|false`
 - `preset` — `build|coverage|release|docs|quality`
@@ -45,12 +47,12 @@ python api/stats_index.py
 Пример:
 
 ```text
-/badge?preset=release&label=deploy&value=prod&style=for-the-badge&icon=rocket&theme=sunset
+/badge?preset=release&label=deploy&value=prod&style=for-the-badge&icon=rocket&theme=sunset&size=lg
 ```
 
 ### `GET /catalog`
 
-Возвращает JSON со всеми темами, стилями, иконками и пресетами.
+Возвращает JSON с темами, стилями, размерами, иконками, цветовой палитрой и пресетами.
 
 ### `GET /health`
 
@@ -59,26 +61,22 @@ python api/stats_index.py
 ## Встраивание в README
 
 ```md
-![build](https://your-domain.vercel.app/badge?label=build&value=passing&icon=check&theme=terminal)
+![build](https://your-domain.vercel.app/badge?label=build&value=passing&icon=check&theme=terminal&size=md)
 ```
 
 ```md
-![coverage](https://your-domain.vercel.app/badge?label=coverage&value=98%25&style=plastic&gradient=true&theme=dark)
+![release](https://your-domain.vercel.app/badge?label=release&value=v2.1.0&style=pill&theme=neon&size=xl&scale=1.1)
 ```
 
 ## Локальные примеры
 
-Обновить sample SVG:
-
 ```bash
-python scripts/refresh_sample_svgs.py
+python3 scripts/refresh_sample_svgs.py
 ```
 
-Файлы будут в `sample_*.svg/`.
+Файлы появятся в `sample_*.svg/`.
 
 ## Deploy на Vercel
-
-Проект уже готов к serverless deploy через `vercel.json`.
 
 ```bash
 vercel

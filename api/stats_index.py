@@ -34,6 +34,13 @@ def _param_int(name: str, default: int, lo: int, hi: int) -> int:
         return default
 
 
+def _param_float(name: str, default: float, lo: float, hi: float) -> float:
+    try:
+        return min(max(float(request.args.get(name, default)), lo), hi)
+    except (TypeError, ValueError):
+        return default
+
+
 def _svg_response(svg: str) -> Response:
     return Response(
         svg,
@@ -68,10 +75,12 @@ def badge():
         label_color=_param("label_color") or None,
         value_color=_param("value_color") or None,
         border_color=_param("border_color") or None,
-        border_radius=_param_int("border_radius", 4, 0, 18),
+        border_radius=_param_int("border_radius", 4, 0, 999),
         gradient=_param_bool("gradient", False),
         uppercase=_param_bool("uppercase", False),
         compact=_param_bool("compact", False),
+        size=_param("size", preset.get("size", "md")),
+        scale=_param_float("scale", 1.0, 0.7, 2.0),
     )
     return _svg_response(svg)
 

@@ -10,10 +10,11 @@ sys.path.insert(0, str(API_DIR))
 from github_stats import generate_custom_badge
 
 SAMPLES = {
-    "sample_build.svg": dict(label="build", value="passing", icon="check", theme="terminal", style="flat"),
-    "sample_release.svg": dict(label="release", value="v2.0.0", icon="rocket", theme="sunset", style="for-the-badge", uppercase=True),
-    "sample_coverage.svg": dict(label="coverage", value="98%", icon="bolt", theme="dark", style="plastic", gradient=True),
-    "sample_docs.svg": dict(label="docs", value="stable", icon="docs", theme="light", style="social"),
+    "sample_build.svg": dict(label="build", value="passing", icon="check", theme="terminal", style="flat", size="md"),
+    "sample_release.svg": dict(label="release", value="v2.1.0", icon="rocket", theme="sunset", style="for-the-badge", size="lg"),
+    "sample_coverage.svg": dict(label="coverage", value="98%", icon="bolt", theme="dark", style="plastic", gradient=True, size="md"),
+    "sample_docs.svg": dict(label="docs", value="stable", icon="docs", theme="light", style="outline", size="sm"),
+    "sample_quality.svg": dict(label="quality", value="A+", icon="star", theme="neon", style="pill", size="xl", scale=1.1),
 }
 
 
