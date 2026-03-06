@@ -186,3 +186,4 @@ def generate_custom_badge(
 <text x="{left_width + (right_width / 2)}" y="{(height / 2) + (font_size * 0.33)}" fill="{_esc(fg_right)}" font-size="{font_size}" font-family="{FONT}" font-weight="{profile.font_weight}" text-anchor="middle">{_esc(value_render)}</text>
 {overlay}
 </svg>'''
+    return svg
