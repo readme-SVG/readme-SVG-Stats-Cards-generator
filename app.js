@@ -765,6 +765,20 @@ function initFormWiring() {
   }
 }
 
+function initControlSections() {
+  const sections = Array.from(document.querySelectorAll('.ctrl-section'));
+
+  sections.forEach(section => {
+    section.open = false;
+    section.addEventListener('toggle', () => {
+      if (!section.open) return;
+      sections.forEach(other => {
+        if (other !== section) other.open = false;
+      });
+    });
+  });
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ACTION BUTTONS
    ═══════════════════════════════════════════════════════════════ */
@@ -842,6 +856,7 @@ function initThemeToggle() {
 
 function init() {
   initThemeToggle();
+  initControlSections();
   initPresets();
   initFormWiring();
   initColorSync();
