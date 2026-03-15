@@ -1,0 +1,57 @@
+# ──────────────────────────────────────────────────────────────
+# CodeQL — Static Application Security Testing (SAST)
+# Runs on pushes to main, PRs targeting main, and weekly.
+# CodeQL finds security vulnerabilities such as injection,
+# XSS, path traversal, and insecure deserialization in Python.
+# ──────────────────────────────────────────────────────────────
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly on Monday at 06:00 UTC to catch new CVE patterns.
+    - cron: "0 6 * * 1"
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: CodeQL analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write  # Required to upload SARIF results.
+      contents: read
+      actions: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # UPDATE: add more languages if the project grows (e.g., javascript).
+        language: [python]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # Use the default query suite plus security-extended for
+          # broader coverage of vulnerability patterns.
+          queries: +security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
