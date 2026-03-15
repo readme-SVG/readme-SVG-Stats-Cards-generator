@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Generate custom SVG badges for GitHub READMEs — zero server, runs entirely in your browser." />
+  <title>Badge Forge — SVG Badge Generator</title>
+
+  <!-- Google Fonts: Roboto + Roboto Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234D2484'/><text x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='%23D0BCFF' font-family='monospace' font-weight='bold'>⬡</text></svg>" />
+</head>
+<body>
+
+  <!-- ─── TOP APP BAR ───────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">⬡</div>
+        <div class="brand-text">
+          <span class="brand-title">Badge Forge</span>
+          <span class="brand-sub">SVG Badge Generator</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span class="theme-icon theme-icon--dark" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+            </svg>
+          </span>
+          <span class="theme-icon theme-icon--light" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1V3c0-.55.45-1 1-1zm0 18c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1s1 .45 1 1v2c0 .55-.45 1-1 1zM4.22 5.64a.999.999 0 0 1 1.42-1.42l1.42 1.42a.999.999 0 1 1-1.42 1.42L4.22 5.64zm12.72 12.72a.999.999 0 0 1 1.41-1.41l1.42 1.41a.999.999 0 1 1-1.41 1.41l-1.42-1.41zM3 12c0-.55.45-1 1-1h2c.55 0 1 .45 1 1s-.45 1-1 1H4c-.55 0-1-.45-1-1zm15 0c0-.55.45-1 1-1h2c.55 0 1 .45 1 1s-.45 1-1 1h-2c-.55 0-1-.45-1-1zM4.22 18.36l1.42-1.42a.999.999 0 1 1 1.42 1.42L5.64 19.78a.999.999 0 0 1-1.42-1.42zm12.72-12.72l1.41-1.42a.999.999 0 1 1 1.41 1.42l-1.41 1.41a.999.999 0 1 1-1.41-1.41z"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── SNACKBAR (Toast) ──────────────────────────────────── -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ─── MAIN LAYOUT ──────────────────────────────────────── -->
+  <main class="app-layout">
+
+    <!-- ══════════════ CONTROLS PANEL ══════════════ -->
+    <aside class="controls-panel" aria-label="Badge controls">
+
+      <!-- Quick Presets -->
+      <details class="ctrl-section" open>
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Quick Presets</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="preset-grid" id="presetGrid" role="group" aria-label="Badge presets"></div>
+        </div>
+      </details>
+
+      <!-- Content -->
+      <details class="ctrl-section" open>
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Content</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="inputLabel">Label</label>
+              <input class="field-input" id="inputLabel" type="text" value="build" maxlength="40" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="inputValue">Value</label>
+              <input class="field-input" id="inputValue" type="text" value="passing" maxlength="52" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Appearance -->
+      <details class="ctrl-section" open>
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5S18.33 12 17.5 12z"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Appearance</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="select-grid">
+            <div class="field">
+              <label class="field-label" for="inputStyle">Style</label>
+              <select class="field-select" id="inputStyle"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="inputTheme">Theme</label>
+              <select class="field-select" id="inputTheme"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="inputSize">Size</label>
+              <select class="field-select" id="inputSize"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="inputScale">
+                Scale
+                <span class="range-val" id="scaleVal">1.00×</span>
+              </label>
+              <input class="field-range" id="inputScale" type="range" min="0.7" max="2" step="0.05" value="1" />
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Colors -->
+      <details class="ctrl-section" open>
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0 1 12 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 0 0-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 0 1 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z"/>
+              <circle cx="6.5" cy="11.5" r="1.5"/><circle cx="9.5" cy="7.5" r="1.5"/>
+              <circle cx="14.5" cy="7.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Colors</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="color-grid">
+            <div class="field" data-color-field="labelBg">
+              <label class="field-label" for="inputLabelBg">Label BG</label>
+              <div class="color-row">
+                <input class="field-input color-text" id="inputLabelBg" type="text" placeholder="#1f2937" maxlength="7" />
+                <input class="color-swatch" id="pickerLabelBg" type="color" value="#1f2937" aria-label="Label background color picker" />
+              </div>
+            </div>
+            <div class="field" data-color-field="valueBg">
+              <label class="field-label" for="inputValueBg">Value BG</label>
+              <div class="color-row">
+                <input class="field-input color-text" id="inputValueBg" type="text" placeholder="#111827" maxlength="7" />
+                <input class="color-swatch" id="pickerValueBg" type="color" value="#111827" aria-label="Value background color picker" />
+              </div>
+            </div>
+            <div class="field" data-color-field="labelColor">
+              <label class="field-label" for="inputLabelColor">Label Text</label>
+              <div class="color-row">
+                <input class="field-input color-text" id="inputLabelColor" type="text" placeholder="#f3f4f6" maxlength="7" />
+                <input class="color-swatch" id="pickerLabelColor" type="color" value="#f3f4f6" aria-label="Label text color picker" />
+              </div>
+            </div>
+            <div class="field" data-color-field="valueColor">
+              <label class="field-label" for="inputValueColor">Value Text</label>
+              <div class="color-row">
+                <input class="field-input color-text" id="inputValueColor" type="text" placeholder="#93c5fd" maxlength="7" />
+                <input class="color-swatch" id="pickerValueColor" type="color" value="#93c5fd" aria-label="Value text color picker" />
+              </div>
+            </div>
+            <div class="field" data-color-field="borderColor">
+              <label class="field-label" for="inputBorderColor">Border</label>
+              <div class="color-row">
+                <input class="field-input color-text" id="inputBorderColor" type="text" placeholder="#374151" maxlength="7" />
+                <input class="color-swatch" id="pickerBorderColor" type="color" value="#374151" aria-label="Border color picker" />
+              </div>
+            </div>
+          </div>
+          <div class="palette-section">
+            <p class="palette-hint">Click a swatch to apply to focused color field</p>
+            <div class="palette-grid" id="paletteGrid" role="group" aria-label="Color palette"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Advanced -->
+      <details class="ctrl-section">
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Advanced</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="field">
+            <label class="field-label" for="inputRadius">
+              Border Radius
+              <span class="range-val" id="radiusVal">4</span>
+            </label>
+            <input class="field-range" id="inputRadius" type="range" min="0" max="50" step="1" value="4" />
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-item">
+              <input class="toggle-check" id="optGradient" type="checkbox" />
+              <span class="toggle-indicator" aria-hidden="true"></span>
+              <span>Gradient overlay</span>
+            </label>
+            <label class="toggle-item">
+              <input class="toggle-check" id="optUppercase" type="checkbox" />
+              <span class="toggle-indicator" aria-hidden="true"></span>
+              <span>Uppercase</span>
+            </label>
+            <label class="toggle-item">
+              <input class="toggle-check" id="optCompact" type="checkbox" />
+              <span class="toggle-indicator" aria-hidden="true"></span>
+              <span>Compact</span>
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <!-- Icon -->
+      <details class="ctrl-section">
+        <summary class="ctrl-section-header">
+          <span class="ctrl-section-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>
+            </svg>
+          </span>
+          <h2 class="ctrl-title">Icon</h2>
+          <span class="ctrl-chevron" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </summary>
+        <div class="ctrl-section-body">
+          <div class="icon-picker-grid" id="iconPickerGrid" role="group" aria-label="Built-in icons"></div>
+          <div class="icon-upload-area">
+            <label class="field-label" for="iconFileInput">Custom image</label>
+            <div class="icon-upload-row">
+              <label class="upload-btn" for="iconFileInput">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                <span>Choose file</span>
+                <input id="iconFileInput" type="file" accept="image/*" aria-label="Upload custom icon" />
+              </label>
+              <img id="iconPreviewImg" class="icon-preview-img" src="" alt="Icon preview" hidden />
+              <button class="icon-clear-btn" id="iconClearBtn" hidden aria-label="Remove icon">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+    </aside><!-- /controls-panel -->
+
+    <!-- ══════════════ OUTPUT PANEL ══════════════ -->
+    <section class="output-panel" aria-label="Badge preview and output">
+
+      <!-- Live Preview -->
+      <div class="preview-card">
+        <div class="preview-toolbar">
+          <span class="preview-label">Live Preview</span>
+          <div class="preview-bg-switcher" role="group" aria-label="Preview background">
+            <button class="bg-btn active" data-bg="checker" aria-pressed="true">Checker</button>
+            <button class="bg-btn" data-bg="dark" aria-pressed="false">Dark</button>
+            <button class="bg-btn" data-bg="light" aria-pressed="false">Light</button>
+          </div>
+        </div>
+        <div class="preview-stage checker" id="previewStage">
+          <div class="preview-svg-wrap" id="previewSvgWrap"></div>
+        </div>
+        <div class="preview-meta">
+          <span id="badgeDimensions" class="badge-dims">—</span>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <button class="action-btn action-btn--primary" id="btnCopySvg">
+          <span class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+          </span>
+          Copy SVG
+        </button>
+        <button class="action-btn action-btn--tonal" id="btnCopyMarkdown">
+          <span class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            </svg>
+          </span>
+          Copy Markdown
+        </button>
+        <button class="action-btn" id="btnDownloadSvg">
+          <span class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+          </span>
+          Download
+        </button>
+        <button class="action-btn action-btn--danger" id="btnReset">
+          <span class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+            </svg>
+          </span>
+          Reset
+        </button>
+      </div>
+
+      <!-- Output: Markdown -->
+      <div class="output-group">
+        <div class="output-header">
+          <label class="output-label" for="outputMarkdown">Markdown</label>
+          <button class="output-copy-btn" data-target="outputMarkdown" aria-label="Copy markdown">Copy</button>
+        </div>
+        <textarea class="output-textarea" id="outputMarkdown" readonly spellcheck="false"></textarea>
+      </div>
+
+      <!-- Output: SVG Code -->
+      <div class="output-group">
+        <div class="output-header">
+          <label class="output-label" for="outputSvg">SVG Code</label>
+          <button class="output-copy-btn" data-target="outputSvg" aria-label="Copy SVG code">Copy</button>
+        </div>
+        <textarea class="output-textarea output-textarea--tall" id="outputSvg" readonly spellcheck="false"></textarea>
+      </div>
+
+      <!-- Style Gallery -->
+      <div class="gallery-section">
+        <h2 class="gallery-title">All Styles</h2>
+        <div class="gallery-grid" id="galleryStyles"></div>
+      </div>
+
+      <!-- Theme Gallery -->
+      <div class="gallery-section">
+        <h2 class="gallery-title">All Themes</h2>
+        <div class="gallery-grid" id="galleryThemes"></div>
+      </div>
+
+    </section><!-- /output-panel -->
+
+  </main><!-- /app-layout -->
+
+  <!-- ─── FOOTER ────────────────────────────────────────────── -->
+  <footer class="app-footer">
+    <p>Badge Forge &mdash; 100% client-side SVG generation &nbsp;&middot;&nbsp; No servers, no uploads</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
