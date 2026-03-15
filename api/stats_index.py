@@ -15,11 +15,16 @@ app = Flask(__name__)
 
 
 def _param(name: str, default: str = "") -> str:
+    if request.method == "POST":
+        return (request.form.get(name) or request.args.get(name, default)).strip()
     return request.args.get(name, default).strip()
 
 
 def _param_bool(name: str, default: bool = False) -> bool:
-    value = request.args.get(name, "").strip().lower()
+    if request.method == "POST":
+        value = (request.form.get(name) or request.args.get(name, "")).strip().lower()
+    else:
+        value = request.args.get(name, "").strip().lower()
     if value in ("1", "true", "yes", "on"):
         return True
     if value in ("0", "false", "no", "off"):
@@ -29,14 +34,16 @@ def _param_bool(name: str, default: bool = False) -> bool:
 
 def _param_int(name: str, default: int, lo: int, hi: int) -> int:
     try:
-        return min(max(int(request.args.get(name, default)), lo), hi)
+        raw = request.form.get(name, request.args.get(name, default)) if request.method == "POST" else request.args.get(name, default)
+        return min(max(int(raw), lo), hi)
     except (TypeError, ValueError):
         return default
 
 
 def _param_float(name: str, default: float, lo: float, hi: float) -> float:
     try:
-        return min(max(float(request.args.get(name, default)), lo), hi)
+        raw = request.form.get(name, request.args.get(name, default)) if request.method == "POST" else request.args.get(name, default)
+        return min(max(float(raw), lo), hi)
     except (TypeError, ValueError):
         return default
 
@@ -59,15 +66,17 @@ def index():
         return Response(file.read(), mimetype="text/html")
 
 
-@app.route("/badge")
+@app.route("/badge", methods=["GET", "POST"])
 def badge():
     preset_name = _param("preset")
     preset = resolve_preset(preset_name)
 
+    icon_data = _param("icon_data") or None
+
     svg = generate_custom_badge(
         label=_param("label", preset["label"]),
         value=_param("value", preset["value"]),
-        icon=_param("icon", preset["icon"]),
+        icon=_param("icon", preset.get("icon", "none")),
         style=_param("style", preset["style"]),
         theme=_param("theme", preset["theme"]),
         label_bg=_param("label_bg") or None,
@@ -81,6 +90,7 @@ def badge():
         compact=_param_bool("compact", False),
         size=_param("size", preset.get("size", "md")),
         scale=_param_float("scale", 1.0, 0.7, 2.0),
+        icon_data=icon_data,
     )
     return _svg_response(svg)
 
