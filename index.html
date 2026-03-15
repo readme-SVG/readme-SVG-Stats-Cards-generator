@@ -51,6 +51,11 @@
 
     <!-- ══════════════ CONTROLS PANEL ══════════════ -->
     <aside class="controls-panel" aria-label="Badge controls">
+      <div class="controls-intro">
+        <p class="controls-kicker">Configuration</p>
+        <h1 class="controls-heading">Build your badge</h1>
+        <p class="controls-note">Tune content, style and colors on the left. Copy or download from the workspace on the right.</p>
+      </div>
 
       <!-- Quick Presets -->
       <details class="ctrl-section" open>
@@ -270,6 +275,10 @@
 
     <!-- ══════════════ OUTPUT PANEL ══════════════ -->
     <section class="output-panel" aria-label="Badge preview and output">
+      <div class="workspace-summary">
+        <p class="workspace-kicker">Workspace</p>
+        <h2 class="workspace-title">Preview and export</h2>
+      </div>
 
       <!-- Live Preview -->
       <div class="preview-card">
@@ -325,22 +334,23 @@
         </button>
       </div>
 
-      <!-- Output: Markdown -->
-      <div class="output-group">
-        <div class="output-header">
-          <label class="output-label" for="outputMarkdown">Markdown</label>
-          <button class="output-copy-btn" data-target="outputMarkdown" aria-label="Copy markdown">Copy</button>
+      <!-- Output: Markdown + SVG -->
+      <div class="output-grid">
+        <div class="output-group">
+          <div class="output-header">
+            <label class="output-label" for="outputMarkdown">Markdown</label>
+            <button class="output-copy-btn" data-target="outputMarkdown" aria-label="Copy markdown">Copy</button>
+          </div>
+          <textarea class="output-textarea" id="outputMarkdown" readonly spellcheck="false"></textarea>
         </div>
-        <textarea class="output-textarea" id="outputMarkdown" readonly spellcheck="false"></textarea>
-      </div>
 
-      <!-- Output: SVG Code -->
-      <div class="output-group">
-        <div class="output-header">
-          <label class="output-label" for="outputSvg">SVG Code</label>
-          <button class="output-copy-btn" data-target="outputSvg" aria-label="Copy SVG code">Copy</button>
+        <div class="output-group">
+          <div class="output-header">
+            <label class="output-label" for="outputSvg">SVG Code</label>
+            <button class="output-copy-btn" data-target="outputSvg" aria-label="Copy SVG code">Copy</button>
+          </div>
+          <textarea class="output-textarea output-textarea--tall" id="outputSvg" readonly spellcheck="false"></textarea>
         </div>
-        <textarea class="output-textarea output-textarea--tall" id="outputSvg" readonly spellcheck="false"></textarea>
       </div>
 
       <!-- Style Gallery -->
