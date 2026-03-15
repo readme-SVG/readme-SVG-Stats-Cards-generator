@@ -106,6 +106,24 @@ def _style_border(style_name: str, border_width: int, border_color: str) -> str:
     return None, f' stroke="{_esc(border_color)}" stroke-width="{border_width}"'
 
 
+_DATA_URI_RE = re.compile(
+    r"^data:image/(?:png|jpeg|gif|svg\+xml|webp);base64,[A-Za-z0-9+/=]+$"
+)
+
+MAX_ICON_DATA_LEN = 200_000  # ~150 KB image after base64 encoding
+
+
+def _validate_icon_data(data_uri: str | None) -> str | None:
+    """Return sanitised data-URI or None if invalid / too large."""
+    if not data_uri:
+        return None
+    if len(data_uri) > MAX_ICON_DATA_LEN:
+        return None
+    if not _DATA_URI_RE.match(data_uri):
+        return None
+    return data_uri
+
+
 def generate_custom_badge(
     label: str = "build",
     value: str = "passing",
@@ -123,6 +141,7 @@ def generate_custom_badge(
     compact: bool = False,
     size: str = "md",
     scale: float = 1.0,
+    icon_data: str | None = None,
 ):
     profile = STYLE_MAP.get(style, STYLE_MAP["flat"])
     palette = _resolve_theme(theme)
@@ -130,7 +149,13 @@ def generate_custom_badge(
     active_uppercase = profile.uppercase or uppercase
     label_text = (label or "label")[:40]
     value_text = (value or "value")[:52]
-    symbol = ICON_SET.get(icon, "")
+
+    # Custom uploaded icon takes precedence over built-in icon set.
+    validated_icon_data = _validate_icon_data(icon_data)
+    if validated_icon_data:
+        symbol = ""
+    else:
+        symbol = ICON_SET.get(icon, "")
     full_label_text = f"{symbol} {label_text}".strip() if symbol else label_text
 
     bg_left = _safe_color(label_bg, palette["label_bg"])
@@ -155,7 +180,11 @@ def generate_custom_badge(
     font_size = max(9, int(round(base_font * factor)))
     radius = min(int(round(base_radius * factor)), max(0, int(height / 2)))
 
-    left_width = _text_width(full_label_text, font_size, active_uppercase) + 2 * pad_x
+    # When a custom icon image is present, reserve space for it in the left section.
+    icon_img_size = int(height * 0.7) if validated_icon_data else 0
+    icon_gap = 4 if validated_icon_data else 0
+
+    left_width = _text_width(full_label_text, font_size, active_uppercase) + 2 * pad_x + icon_img_size + icon_gap
     right_width = _text_width(value_text, font_size, active_uppercase) + 2 * pad_x
     total_width = left_width + right_width
 
@@ -177,13 +206,27 @@ def generate_custom_badge(
 </linearGradient></defs>"""
         overlay = f'<rect x="0" y="0" width="{total_width}" height="{height}" fill="url(#g)" rx="{radius}" ry="{radius}" />'
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="{height}" role="img" aria-label="{_esc(label_render)}: {_esc(value_render)}">
+    # Build optional <image> element for custom uploaded icon.
+    icon_element = ""
+    if validated_icon_data:
+        icon_x = pad_x
+        icon_y = int((height - icon_img_size) / 2)
+        icon_element = (
+            f'<image x="{icon_x}" y="{icon_y}" width="{icon_img_size}" height="{icon_img_size}"'
+            f' href="{validated_icon_data}" />'
+        )
+        # Shift the label text right to make room for the icon.
+        label_text_x = pad_x + icon_img_size + icon_gap + _text_width(full_label_text, font_size, active_uppercase) / 2
+    else:
+        label_text_x = left_width / 2
+
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{total_width}" height="{height}" role="img" aria-label="{_esc(label_render)}: {_esc(value_render)}">
 {defs}
 <rect x="0" y="0" width="{left_width}" height="{height}" fill="{_esc(left_fill)}" rx="{radius}" ry="{radius}"{border_attr} />
 <rect x="{left_width}" y="0" width="{right_width}" height="{height}" fill="{_esc(right_fill)}" rx="{radius}" ry="{radius}"{border_attr} />
 <rect x="{max(0, left_width - radius)}" y="0" width="{radius}" height="{height}" fill="{_esc(left_fill)}" />
-<text x="{left_width / 2}" y="{(height / 2) + (font_size * 0.33)}" fill="{_esc(fg_left)}" font-size="{font_size}" font-family="{FONT}" font-weight="{profile.font_weight}" text-anchor="middle">{_esc(label_render)}</text>
+{icon_element}
+<text x="{label_text_x}" y="{(height / 2) + (font_size * 0.33)}" fill="{_esc(fg_left)}" font-size="{font_size}" font-family="{FONT}" font-weight="{profile.font_weight}" text-anchor="middle">{_esc(label_render)}</text>
 <text x="{left_width + (right_width / 2)}" y="{(height / 2) + (font_size * 0.33)}" fill="{_esc(fg_right)}" font-size="{font_size}" font-family="{FONT}" font-weight="{profile.font_weight}" text-anchor="middle">{_esc(value_render)}</text>
 {overlay}
 </svg>'''
-    return svg
