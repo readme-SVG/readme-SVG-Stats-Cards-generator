@@ -2,107 +2,106 @@
 
 ## 1. Introduction
 
-Thank you for your interest in contributing to this logging library project. We value thoughtful, well-tested contributions from the community and aim to keep collaboration efficient, respectful, and technically rigorous.
+Thank you for your interest in contributing to this logging library. We appreciate your time, engineering effort, and willingness to improve reliability, observability, and developer experience for the broader community.
 
-Whether you are fixing a bug, improving documentation, proposing a new logging transport, or optimizing performance, your contributions help keep this library reliable in production environments.
+This document defines the expected contribution workflow so your changes can be reviewed and merged with minimal friction. Following these guidelines helps maintain predictable release quality, stable APIs, and efficient maintainer review cycles.
 
 ## 2. I Have a Question
 
-Please note that the GitHub issue tracker is reserved for:
+The GitHub issue tracker is strictly reserved for:
 - Reproducible bug reports
 - Actionable feature requests
 
-The issue tracker is **not** the right channel for general usage questions, troubleshooting one-off local setups, or “how do I” discussions.
+Please do **not** open an issue for usage questions, setup support, architecture brainstorming, or “how do I” requests.
 
-For questions, use one of the following channels instead:
+For questions and general discussion, use:
 - GitHub Discussions (preferred)
-- Stack Overflow (tag with relevant language/framework tags and project name)
-- Any dedicated community channel linked in the repository README
+- Stack Overflow (include relevant language/framework tags)
+- Any dedicated community channels linked in `README.md`
 
-When asking a question, include:
-- Library version
-- Runtime and framework context
-- Minimal code snippet
-- What you already tried
+When asking a question, include enough context to get a useful answer quickly:
+- Logging library version
+- Runtime version (for example Node.js/Python)
+- Framework/integration details
+- Minimal code sample
+- Error output and what you already tried
 
 ## 3. Reporting Bugs
 
-High-quality bug reports dramatically reduce triage time. A good report should allow a maintainer to reproduce the issue without guessing.
+A strong bug report should be deterministic, scoped, and independently reproducible by a maintainer.
 
-### Search Duplicates First
+### Search Duplicates
 
-Before opening a new issue:
-1. Search open issues for the same or similar symptoms.
-2. Search closed issues for prior fixes or workarounds.
-3. If a matching issue exists, add reproducible details there instead of opening a duplicate.
+Before creating a new issue:
+1. Search existing **open issues** for matching symptoms.
+2. Search **closed issues** for prior fixes, regressions, or known limitations.
+3. If a matching issue exists, add new reproducible evidence there instead of opening a duplicate.
 
-### Required Environment Details
+### Environment
 
-Include complete runtime context:
-- Operating system and version (for example, Ubuntu 24.04, macOS 14.6, Windows 11)
-- Library version (and whether from PyPI/npm/etc. or source)
-- Language runtime version (for example, Python 3.12, Node 20)
-- Framework version(s) if applicable
-- Deployment context (local dev, Docker, serverless, CI runner)
+Always include a complete environment matrix:
+- OS and version (for example Ubuntu 24.04, macOS 14, Windows 11)
+- Library version and install source (package registry vs source checkout)
+- Language/runtime version (for example Python 3.12, Node.js 20)
+- Framework versions (if applicable)
+- Execution context (local machine, Docker, CI, serverless, container runtime)
 
 ### Steps to Reproduce
 
-Provide a deterministic reproduction algorithm:
-1. Preconditions (configuration, env vars, input payload, external dependencies)
-2. Exact command(s) executed
-3. Minimal code snippet or repository reproducer
-4. Observed output, logs, stack trace, or generated artifacts
+Provide a step-by-step algorithm that reproduces the issue from a clean state:
+1. Preconditions (configuration, env vars, inputs, external dependencies)
+2. Exact commands executed
+3. Minimal reproducible code snippet or repository
+4. Logs, stack traces, output artifacts, and failure frequency
 
-Avoid vague descriptions such as “sometimes fails.” If nondeterministic, describe frequency and patterns.
+If behavior is intermittent, include frequency patterns and conditions that increase likelihood.
 
 ### Expected vs. Actual Behavior
 
-Clearly state:
-- **Expected behavior:** What should happen according to docs/spec/design
-- **Actual behavior:** What happened instead
-- **Impact:** Why this is problematic (data loss, incorrect formatting, crash, performance regression)
+Clearly separate the two outcomes:
+- **Expected behavior**: what should happen according to docs/spec/design
+- **Actual behavior**: what happened instead
 
-### Report Quality Checklist
+Also include impact severity (for example crash, data loss, incorrect log serialization, memory regression, performance degradation).
 
-Before submitting, ensure your issue contains:
-- A descriptive title
-- Reproduction steps that work from a clean environment
-- Environment details
-- Expected/actual behavior
-- Logs or stack traces (sanitized)
+### High-Quality Bug Report Checklist
+
+A complete report should include:
+- Clear and searchable title
+- Reproduction steps that work on a fresh environment
+- Full environment details
+- Expected and actual behavior
+- Sanitized logs/errors/tracebacks
+- Any relevant workaround discovered
 
 ## 4. Suggesting Enhancements
 
-Enhancement proposals should be concrete, scoped, and justified by real-world needs.
+Enhancement proposals should describe a real problem, a feasible solution, and practical adoption scenarios.
 
-### What to Include
+When suggesting a feature or architectural change, include:
+- **Justification**: the specific problem or limitation being solved
+- **Use cases**: concrete real-world scenarios and expected outcomes
+- **Proposed API/design**: rough interface, configuration shape, and lifecycle impact
+- **Alternatives considered**: existing approaches and why they are insufficient
+- **Compatibility considerations**: migration path, deprecations, or potential breaking changes
 
-When proposing a feature or architectural change, include:
-- **Problem statement:** The specific limitation or pain point
-- **Justification:** Why current behavior is insufficient
-- **Use cases:** Concrete, real-world examples with expected outcomes
-- **Proposed API/design:** Suggested interface, configuration, and migration implications
-- **Alternatives considered:** Existing workarounds and why they are not adequate
-
-### Scope Expectations
-
-Large architectural proposals (for example, new plugin APIs, lifecycle hooks, or async pipelines) should start as a discussion before implementation. This prevents wasted effort and helps align with roadmap priorities.
+For larger proposals (new transport abstractions, pipeline architecture changes, plugin systems), open a discussion first to align on direction before implementation.
 
 ## 5. Local Development / Setup
 
-Use the following baseline setup for local development.
+Follow these steps to prepare a local development environment.
 
 ### Fork and Clone
 
-1. Fork the repository on GitHub.
-2. Clone your fork:
+1. Fork the repository to your GitHub account.
+2. Clone your fork and enter the project directory:
 
 ```bash
 git clone https://github.com/<your-username>/readme-SVG-custom-badge-generator.git
 cd readme-SVG-custom-badge-generator
 ```
 
-3. Add the canonical upstream remote:
+3. Add upstream and fetch latest references:
 
 ```bash
 git remote add upstream https://github.com/<upstream-org-or-user>/readme-SVG-custom-badge-generator.git
@@ -111,7 +110,7 @@ git fetch upstream
 
 ### Dependencies
 
-Create a virtual environment and install dependencies:
+Install Python dependencies:
 
 ```bash
 python -m venv .venv
@@ -119,58 +118,61 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+If you are working on JavaScript-facing changes, also install Node dependencies when `package.json` is present:
+
+```bash
+npm install
+```
+
 ### Environment Variables
 
-If your change requires environment configuration, create a local environment file:
+If an environment template exists, initialize local environment variables:
 
 ```bash
 cp .env.example .env
 ```
 
-If `.env.example` does not exist, document required variables in your PR description and keep secrets out of version control.
+If no `.env.example` exists, define required variables manually and document them in your PR. Never commit secrets.
 
 ### Running Locally
 
-Start the local development endpoint:
+Run the local service or scripts used during development:
 
 ```bash
 python api/stats_index.py
-```
-
-Optional maintenance utility for sample SVG updates:
-
-```bash
 python scripts/refresh_sample_svgs.py
 ```
 
+Use additional project-specific commands from `README.md` when validating feature-specific paths.
+
 ## 6. Pull Request Process
 
-Follow this workflow to keep reviews predictable and fast.
+Use the workflow below for all pull requests.
 
 ### Branching Strategy
 
-Create branches from the latest `main` using one of these conventions:
-- `feature/<short-feature-name>`
-- `bugfix/<issue-number-or-short-slug>`
+Create branches from `main` using one of these conventions:
+- `feature/<short-description>`
+- `bugfix/<issue-number-or-short-description>`
 - `docs/<scope>`
 - `chore/<scope>`
 
 Examples:
-- `feature/json-structured-formatter`
-- `bugfix/142-memory-leak-on-flush`
+- `feature/structured-json-output`
+- `bugfix/214-broken-svg-escaping`
 
 ### Commit Messages
 
-Use Conventional Commits:
-- `feat: add async batching transport`
-- `fix: prevent duplicate handler registration`
-- `docs: clarify formatter extension points`
-- `test: add regression for dropped records`
-- `chore: update CI matrix`
+All commits must follow Conventional Commits:
+- `feat: add batched transport flush policy`
+- `fix: prevent duplicate logger handlers`
+- `docs: clarify configuration precedence`
+- `test: add regression coverage for transport retry`
+- `chore: update CI workflow`
 
 ### Upstream Synchronization
 
-Before opening (or updating) a PR:
+Before opening or updating a PR, sync with latest upstream `main`:
 
 ```bash
 git fetch upstream
@@ -180,83 +182,97 @@ git checkout <your-branch>
 git rebase main
 ```
 
-Resolve conflicts locally, then force-push your branch safely:
+Resolve conflicts locally, then update your branch:
 
 ```bash
 git push --force-with-lease
 ```
 
-### PR Description Requirements
+### PR Description
 
-Every PR should include:
-- Linked issue(s): `Closes #123` or `Related to #123`
-- Problem context and rationale
-- Summary of implementation details
-- Risk/compatibility notes (breaking changes, migration guidance)
-- Evidence of testing (commands + output snippets)
-- Documentation updates when API or behavior changes
+Every PR body must include:
+- Linked issue(s): `Closes #<id>` or `Related to #<id>`
+- Problem statement and technical context
+- Summary of implementation approach
+- Backward-compatibility or migration notes
+- Test coverage proof (commands run and results)
+- Documentation updates for any user-facing behavior changes
 
-PRs without sufficient context or test evidence may be sent back for revision before review.
+PRs with missing context, missing tests, or unclear scope may be returned for revision before review.
 
 ## 7. Styleguides
 
-Contributions must comply with project style and architecture conventions.
+Contributions must meet repository quality standards for formatting, linting, naming, and architecture.
 
-### Formatting and Linting
+### Linters and Formatters
 
-Use these tools:
-- `Black` for Python formatting
-- `Flake8` for Python linting
+Use the following tools:
+- `Black` (Python formatting)
+- `Flake8` (Python linting)
 
-Recommended local commands:
+Run:
 
 ```bash
 black .
 flake8 .
 ```
 
-### Code Quality Expectations
+If JavaScript code is introduced or modified and tooling is configured, run:
 
-- Prefer small, composable functions with explicit inputs/outputs.
-- Keep public API behavior stable unless an approved breaking change is intentional.
-- Use clear names (`render_badge_svg`, `parse_badge_params`, etc.) over ambiguous abbreviations.
-- Avoid hidden side effects and global mutable state where possible.
+```bash
+npm run lint
+npm run format
+```
 
-### Architectural Conventions
+### Architectural and Naming Conventions
 
-- Keep API logic under `api/` focused on request parsing and response composition.
-- Keep transformation/rendering logic deterministic and testable.
-- Keep scripts under `scripts/` task-oriented and isolated from runtime request paths.
-- Update `README.md` when user-facing behavior, parameters, or examples change.
+- Keep endpoint-facing logic in `api/` focused on request parsing and response composition.
+- Keep transformation logic deterministic and testable.
+- Keep scripts in `scripts/` task-oriented and isolated from request-serving paths.
+- Prefer explicit, descriptive names over abbreviations.
+- Preserve backward compatibility for public behavior unless an approved breaking change is planned.
 
 ## 8. Testing
 
-All bug fixes and new features must include relevant test coverage (unit and/or integration-level validation appropriate to the change).
+All bug fixes and new features must include relevant automated tests (unit and/or integration) proportional to change risk.
 
-At minimum, validate local behavior with:
+Minimum local validation commands:
 
 ```bash
 python api/stats_index.py
 python scripts/refresh_sample_svgs.py
 ```
 
-If you add automated tests, document how to run them in your PR description and ensure they pass locally before requesting review.
+Recommended quality checks before opening a PR:
+
+```bash
+black .
+flake8 .
+```
+
+If JS tooling/tests are configured, run:
+
+```bash
+npm test
+```
+
+A pull request is considered review-ready only when tests and checks related to your change pass locally.
 
 ## 9. Code Review Process
 
-After opening a PR:
+After a PR is opened, the review lifecycle is:
 
-1. A maintainer performs initial triage (scope, clarity, and CI/readiness checks).
-2. At least **1 maintainer approval** is required before merge (larger or higher-risk changes may require 2 approvals).
-3. All requested changes must be addressed before merge.
-4. After updates, request re-review from prior reviewers.
-5. Maintainers may squash-merge to keep commit history clean and searchable.
+1. Maintainers perform initial triage for scope, clarity, and baseline readiness.
+2. Automated checks (if configured) must pass before merge consideration.
+3. At least **one maintainer approval** is required for low-risk changes; larger or higher-risk changes may require **two approvals**.
+4. Requested changes must be fully addressed with follow-up commits.
+5. After updates, request re-review from previous reviewers.
+6. Maintainers may squash-merge to keep history concise and traceable.
 
-### Review Expectations
+Reviewer expectations:
+- Keep discussions technical, specific, and outcome-oriented.
+- Reply to each substantive review thread with either an implementation update or rationale.
+- Mark threads resolved only when code and context are fully addressed.
+- Keep PRs focused; unrelated edits should be split into separate PRs.
 
-- Respond to reviewer comments with technical rationale and concrete follow-up.
-- Mark conversations resolved only after code and context are updated.
-- Keep PR scope focused; unrelated changes may be deferred to a separate PR.
-- Be open to iterative refinements in API shape, naming, and internal design.
-
-Thank you for helping improve the project’s reliability, maintainability, and developer experience.
+Thank you again for contributing and helping improve the quality, stability, and maintainability of this logging library.
