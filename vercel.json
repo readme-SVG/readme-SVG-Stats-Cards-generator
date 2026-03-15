@@ -1,10 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/stats_index.py", "use": "@vercel/python" }
-  ],
-  "routes": [
-    { "src": "^/$", "dest": "/api/stats_index.py" },
-    { "src": "^/(badge|catalog|health)$", "dest": "/api/stats_index.py" }
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" }
   ]
 }
