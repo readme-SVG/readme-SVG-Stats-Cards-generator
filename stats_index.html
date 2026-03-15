@@ -49,10 +49,10 @@
         <div>
           <label>Icon (upload image)</label>
           <div style="display:flex;gap:8px;align-items:center;">
-            <input id="icon_file" type="file" accept="image/*" style="flex:1;font-size:12px;" />
-            <img id="icon_preview" style="width:24px;height:24px;border-radius:4px;display:none;border:1px solid #314062;" />
-            <button type="button" id="icon_clear" class="alt" style="padding:6px 10px;font-size:11px;display:none;">✕</button>
+            <input id="icon_file" type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" style="flex:1;font-size:12px;" />
+            <button type="button" id="icon_clear" class="alt" style="padding:6px 10px;font-size:12px;white-space:nowrap;">✕ Clear</button>
           </div>
+          <input type="hidden" id="icon" value="none" />
         </div>
         <div><label>Label</label><input id="label" value="build" /></div>
         <div><label>Value</label><input id="value" value="passing" /></div>
@@ -113,48 +113,28 @@
   <script>
     const ids = ["preset","style","theme","label","value","size","scale","label_bg","value_bg","label_color","value_color","border_color","border_radius","gradient","uppercase","compact"];
     const input = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
-    const iconFileInput = document.getElementById("icon_file");
-    const iconPreview = document.getElementById("icon_preview");
-    const iconClear = document.getElementById("icon_clear");
-    let iconBase64 = "";
 
-    function resizeImage(file, maxSize, callback) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = maxSize;
-          canvas.height = maxSize;
-          const ctx = canvas.getContext("2d");
-          const scale = Math.min(maxSize / img.width, maxSize / img.height);
-          const w = img.width * scale;
-          const h = img.height * scale;
-          ctx.drawImage(img, (maxSize - w) / 2, (maxSize - h) / 2, w, h);
-          callback(canvas.toDataURL("image/png"));
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+    // --- Custom icon upload state ---
+    let iconDataUri = "";  // holds "data:image/png;base64,..." when an image is loaded
+    const iconFileInput = document.getElementById("icon_file");
+    const iconClearBtn = document.getElementById("icon_clear");
 
     iconFileInput.addEventListener("change", () => {
       const file = iconFileInput.files[0];
       if (!file) return;
-      resizeImage(file, 64, (dataUrl) => {
-        iconBase64 = dataUrl;
-        iconPreview.src = dataUrl;
-        iconPreview.style.display = "block";
-        iconClear.style.display = "inline-block";
+      const reader = new FileReader();
+      reader.onload = () => {
+        iconDataUri = reader.result;  // data-URI string
+        input.icon.value = "custom";
         render();
-      });
+      };
+      reader.readAsDataURL(file);
     });
 
-    iconClear.addEventListener("click", () => {
-      iconBase64 = "";
+    iconClearBtn.addEventListener("click", () => {
+      iconDataUri = "";
       iconFileInput.value = "";
-      iconPreview.style.display = "none";
-      iconClear.style.display = "none";
+      input.icon.value = "none";
       render();
     });
 
@@ -182,28 +162,37 @@
     const buildQuery = () => {
       const q = new URLSearchParams();
       Object.entries(input).forEach(([key, el]) => {
+        if (key === "icon") return;  // handled separately below
         if (el.type === "checkbox") {
           if (el.checked) q.set(key, "true");
           return;
         }
         if (el.value.trim()) q.set(key, el.value.trim());
       });
+      if (iconDataUri) {
+        q.set("icon_data", iconDataUri);
+      }
       return q.toString();
     };
 
     const render = () => {
       const query = buildQuery();
       const badgeUrl = `${location.origin}/badge?${query}`;
-      if (iconBase64) {
-        const formData = new URLSearchParams(query);
-        formData.set("icon_data", iconBase64);
-        fetch("/badge", { method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body: formData.toString() })
+      if (iconDataUri) {
+        // Use POST to avoid URL length limits with base64 image data.
+        // Preview is loaded via object URL; the shareable URL omits icon_data.
+        fetch(`/badge`, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: query })
           .then(r => r.text())
           .then(svg => {
-            preview.innerHTML = svg;
-            urlBox.value = badgeUrl + " (icon embedded in preview only)";
-            mdBox.value = `<!-- Custom icon badge - use /badge POST with icon_data -->\n![custom badge](${badgeUrl})`;
+            const blob = new Blob([svg], { type: "image/svg+xml" });
+            preview.innerHTML = `<img alt="badge preview" src="${URL.createObjectURL(blob)}" />`;
           });
+        // Build a clean URL without icon_data for sharing (note: icon won't render via URL alone).
+        const shareQ = new URLSearchParams(query);
+        shareQ.delete("icon_data");
+        const shareUrl = `${location.origin}/badge?${shareQ.toString()}`;
+        urlBox.value = shareUrl + "  (upload icon is embedded only in preview)";
+        mdBox.value = `![custom badge](${shareUrl})`;
       } else {
         preview.innerHTML = `<img alt="badge preview" src="${badgeUrl}" />`;
         urlBox.value = badgeUrl;
@@ -242,7 +231,6 @@
         const appendOptions = (el, values) => values.forEach(v => el.insertAdjacentHTML("beforeend", `<option value="${v}">${v}</option>`));
         appendOptions(input.style, catalog.styles);
         appendOptions(input.theme, catalog.themes);
-        // Icon is now uploaded by user, no dropdown needed
         appendOptions(input.size, catalog.sizes);
         appendOptions(input.preset, Object.keys(catalog.presets));
 
@@ -266,7 +254,10 @@
           if (!p) return;
           input.label.value = p.label;
           input.value.value = p.value;
-          // preset icon ignored - user uploads custom icon
+          // Clear custom icon when switching presets.
+          iconDataUri = "";
+          iconFileInput.value = "";
+          input.icon.value = "none";
           input.theme.value = p.theme;
           input.style.value = p.style;
           input.size.value = p.size || "md";
@@ -276,7 +267,6 @@
         input.preset.value = "build";
         input.style.value = "flat";
         input.theme.value = "terminal";
-        // icon is now user-uploaded
         input.size.value = "md";
         colorFields.forEach(syncInputWithPicker);
         render();
