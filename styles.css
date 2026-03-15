@@ -1273,7 +1273,6 @@ details.ctrl-section[open] .ctrl-chevron {
 
 .output-textarea:hover  { border-color: var(--md-outline); }
 .output-textarea:focus  { border-color: var(--md-primary); border-width: 2px; }
-.output-textarea--tall  { min-height: 120px; }
 
 /* ─── Gallery (MD3 Cards) ────────────────────────────────────── */
 .gallery-section {
