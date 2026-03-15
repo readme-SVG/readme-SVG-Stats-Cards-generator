@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Generate custom SVG badges for GitHub READMEs — zero server, runs entirely in your browser." />
+  <title>Badge Forge — SVG Badge Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%234f46e5'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='white'>⬡</text></svg>" />
+</head>
+<body>
+
+  <!-- ─── HEADER ─────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">⬡</span>
+        <div class="brand-text">
+          <span class="brand-title">Badge Forge</span>
+          <span class="brand-sub">SVG Badge Generator</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span class="theme-icon theme-icon--dark" aria-hidden="true">☾</span>
+          <span class="theme-icon theme-icon--light" aria-hidden="true">☀</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── TOAST NOTIFICATION ─────────────────────────────────── -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ─── MAIN LAYOUT ────────────────────────────────────────── -->
+  <main class="app-layout">
+
+    <!-- ══════════════ CONTROLS PANEL ══════════════ -->
+    <aside class="controls-panel" aria-label="Badge controls">
+
+      <!-- Quick Presets -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Quick Presets</h2>
+        <div class="preset-grid" id="presetGrid" role="group" aria-label="Badge presets"></div>
+      </section>
+
+      <!-- Content -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Content</h2>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="inputLabel">Label</label>
+            <input class="field-input" id="inputLabel" type="text" value="build" maxlength="40" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="inputValue">Value</label>
+            <input class="field-input" id="inputValue" type="text" value="passing" maxlength="52" autocomplete="off" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Appearance -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Appearance</h2>
+        <div class="select-grid">
+          <div class="field">
+            <label class="field-label" for="inputStyle">Style</label>
+            <select class="field-select" id="inputStyle"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="inputTheme">Theme</label>
+            <select class="field-select" id="inputTheme"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="inputSize">Size</label>
+            <select class="field-select" id="inputSize"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="inputScale">Scale <span class="range-val" id="scaleVal">1.00×</span></label>
+            <input class="field-range" id="inputScale" type="range" min="0.7" max="2" step="0.05" value="1" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Colors -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Colors</h2>
+        <div class="color-grid">
+          <div class="field" data-color-field="labelBg">
+            <label class="field-label" for="inputLabelBg">Label BG</label>
+            <div class="color-row">
+              <input class="field-input color-text" id="inputLabelBg" type="text" placeholder="#1f2937" maxlength="7" />
+              <input class="color-swatch" id="pickerLabelBg" type="color" value="#1f2937" aria-label="Label background color picker" />
+            </div>
+          </div>
+          <div class="field" data-color-field="valueBg">
+            <label class="field-label" for="inputValueBg">Value BG</label>
+            <div class="color-row">
+              <input class="field-input color-text" id="inputValueBg" type="text" placeholder="#111827" maxlength="7" />
+              <input class="color-swatch" id="pickerValueBg" type="color" value="#111827" aria-label="Value background color picker" />
+            </div>
+          </div>
+          <div class="field" data-color-field="labelColor">
+            <label class="field-label" for="inputLabelColor">Label Text</label>
+            <div class="color-row">
+              <input class="field-input color-text" id="inputLabelColor" type="text" placeholder="#f3f4f6" maxlength="7" />
+              <input class="color-swatch" id="pickerLabelColor" type="color" value="#f3f4f6" aria-label="Label text color picker" />
+            </div>
+          </div>
+          <div class="field" data-color-field="valueColor">
+            <label class="field-label" for="inputValueColor">Value Text</label>
+            <div class="color-row">
+              <input class="field-input color-text" id="inputValueColor" type="text" placeholder="#93c5fd" maxlength="7" />
+              <input class="color-swatch" id="pickerValueColor" type="color" value="#93c5fd" aria-label="Value text color picker" />
+            </div>
+          </div>
+          <div class="field" data-color-field="borderColor">
+            <label class="field-label" for="inputBorderColor">Border</label>
+            <div class="color-row">
+              <input class="field-input color-text" id="inputBorderColor" type="text" placeholder="#374151" maxlength="7" />
+              <input class="color-swatch" id="pickerBorderColor" type="color" value="#374151" aria-label="Border color picker" />
+            </div>
+          </div>
+        </div>
+        <!-- Color palette -->
+        <div class="palette-section">
+          <p class="palette-hint">Click a swatch to apply to focused color field</p>
+          <div class="palette-grid" id="paletteGrid" role="group" aria-label="Color palette"></div>
+        </div>
+      </section>
+
+      <!-- Advanced -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Advanced</h2>
+        <div class="field">
+          <label class="field-label" for="inputRadius">Border Radius <span class="range-val" id="radiusVal">4</span></label>
+          <input class="field-range" id="inputRadius" type="range" min="0" max="50" step="1" value="4" />
+        </div>
+        <div class="toggle-group">
+          <label class="toggle-item">
+            <input class="toggle-check" id="optGradient" type="checkbox" />
+            <span class="toggle-indicator" aria-hidden="true"></span>
+            <span>Gradient overlay</span>
+          </label>
+          <label class="toggle-item">
+            <input class="toggle-check" id="optUppercase" type="checkbox" />
+            <span class="toggle-indicator" aria-hidden="true"></span>
+            <span>Uppercase</span>
+          </label>
+          <label class="toggle-item">
+            <input class="toggle-check" id="optCompact" type="checkbox" />
+            <span class="toggle-indicator" aria-hidden="true"></span>
+            <span>Compact</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Icon -->
+      <section class="ctrl-section">
+        <h2 class="ctrl-title">Icon</h2>
+        <div class="icon-picker-grid" id="iconPickerGrid" role="group" aria-label="Built-in icons"></div>
+        <div class="icon-upload-area">
+          <label class="field-label" for="iconFileInput">Or upload custom image</label>
+          <div class="icon-upload-row">
+            <label class="upload-btn" for="iconFileInput">
+              <span>Choose file</span>
+              <input id="iconFileInput" type="file" accept="image/*" aria-label="Upload custom icon" />
+            </label>
+            <img id="iconPreviewImg" class="icon-preview-img" src="" alt="Icon preview" hidden />
+            <button class="icon-clear-btn" id="iconClearBtn" hidden aria-label="Remove icon">✕ Remove</button>
+          </div>
+        </div>
+      </section>
+
+    </aside><!-- /controls-panel -->
+
+    <!-- ══════════════ OUTPUT PANEL ══════════════ -->
+    <section class="output-panel" aria-label="Badge preview and output">
+
+      <!-- Live Preview -->
+      <div class="preview-card">
+        <div class="preview-toolbar">
+          <span class="preview-label">Live Preview</span>
+          <div class="preview-bg-switcher" role="group" aria-label="Preview background">
+            <button class="bg-btn active" data-bg="checker" aria-pressed="true">⊞ Checker</button>
+            <button class="bg-btn" data-bg="dark" aria-pressed="false">◾ Dark</button>
+            <button class="bg-btn" data-bg="light" aria-pressed="false">◻ Light</button>
+          </div>
+        </div>
+        <div class="preview-stage checker" id="previewStage">
+          <div class="preview-svg-wrap" id="previewSvgWrap"></div>
+        </div>
+        <div class="preview-meta">
+          <span id="badgeDimensions" class="badge-dims">—</span>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <button class="action-btn action-btn--primary" id="btnCopySvg">
+          <span class="btn-icon">⎘</span> Copy SVG
+        </button>
+        <button class="action-btn" id="btnCopyMarkdown">
+          <span class="btn-icon">⎋</span> Copy Markdown
+        </button>
+        <button class="action-btn" id="btnDownloadSvg">
+          <span class="btn-icon">↓</span> Download SVG
+        </button>
+        <button class="action-btn action-btn--danger" id="btnReset">
+          <span class="btn-icon">↺</span> Reset
+        </button>
+      </div>
+
+      <!-- Outputs -->
+      <div class="output-group">
+        <div class="output-header">
+          <label class="output-label" for="outputMarkdown">Markdown</label>
+          <button class="output-copy-btn" data-target="outputMarkdown" aria-label="Copy markdown">Copy</button>
+        </div>
+        <textarea class="output-textarea" id="outputMarkdown" readonly spellcheck="false"></textarea>
+      </div>
+
+      <div class="output-group">
+        <div class="output-header">
+          <label class="output-label" for="outputSvg">SVG Code</label>
+          <button class="output-copy-btn" data-target="outputSvg" aria-label="Copy SVG code">Copy</button>
+        </div>
+        <textarea class="output-textarea output-textarea--tall" id="outputSvg" readonly spellcheck="false"></textarea>
+      </div>
+
+      <!-- Style Gallery -->
+      <div class="gallery-section">
+        <h2 class="gallery-title">All Styles</h2>
+        <div class="gallery-grid" id="galleryStyles"></div>
+      </div>
+
+      <!-- Theme Gallery -->
+      <div class="gallery-section">
+        <h2 class="gallery-title">All Themes</h2>
+        <div class="gallery-grid" id="galleryThemes"></div>
+      </div>
+
+    </section><!-- /output-panel -->
+
+  </main><!-- /app-layout -->
+
+  <!-- ─── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="app-footer">
+    <p>Badge Forge — 100% client-side SVG generation &nbsp;·&nbsp; No servers, no uploads</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
