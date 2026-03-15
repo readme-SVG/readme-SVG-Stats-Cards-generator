@@ -30,6 +30,7 @@ vercel --prod
 ```
 
 `vercel.json` настроен на отдачу `index.html` на корне сайта.
+Для чисто статического деплоя также используется `.vercelignore`, чтобы Vercel не детектировал Python backend.
 
 ## Структура
 
