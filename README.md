@@ -72,7 +72,7 @@ A zero-backend, production-ready badge generation toolkit for README-driven obse
 │   └── github_stats.py            # Python SVG generation engine
 ├── scripts/
 │   └── refresh_sample_svgs.py     # Rebuild sample SVGs from canonical presets
-├── sample_*.svg/
+├── sample_svgs/
 │   ├── sample_build.svg
 │   ├── sample_coverage.svg
 │   ├── sample_docs.svg
@@ -241,7 +241,7 @@ python process_event.py \
 
 ```markdown
 <!-- Example badge generated via Badge Forge web app -->
-![Logging Status](./logging-status.svg)
+![Build Badge](./sample_svgs/sample_build.svg)
 
 <!-- External shield-style variant for release channel -->
 [![Release Channel](https://img.shields.io/badge/release-stable-22c55e?style=for-the-badge)](#)

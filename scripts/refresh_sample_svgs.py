@@ -19,7 +19,7 @@ SAMPLES = {
 
 
 def main():
-    output_dir = ROOT / "sample_*.svg"
+    output_dir = ROOT / "sample_svgs"
     output_dir.mkdir(exist_ok=True)
     for file_name, params in SAMPLES.items():
         svg = generate_custom_badge(**params)
