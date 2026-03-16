@@ -1450,3 +1450,174 @@ details.ctrl-section[open] .ctrl-chevron {
     animation-duration: 1ms !important;
   }
 }
+
+:root,
+[data-theme="dark"],
+[data-theme="light"] {
+  --sketch-bg: #141414;
+  --sketch-paper: #f0ece0;
+  --sketch-accent: #f4845f;
+  --sketch-muted: #c9c1ad;
+  --sketch-panel: #1b1b1b;
+  --sketch-panel-2: #202020;
+  --font-sans: 'Patrick Hand', 'Caveat', cursive;
+  --font-mono: 'Caveat', 'Patrick Hand', cursive;
+
+  --md-background: var(--sketch-bg);
+  --md-on-background: var(--sketch-paper);
+  --md-surface-lowest: #101010;
+  --md-surface-low: var(--sketch-panel);
+  --md-surface: var(--sketch-panel);
+  --md-surface-high: var(--sketch-panel-2);
+  --md-surface-highest: #262626;
+  --md-surface-container: var(--sketch-panel);
+  --md-surface-variant: #272727;
+  --md-on-surface: var(--sketch-paper);
+  --md-on-surface-variant: var(--sketch-muted);
+  --md-outline: #bdb4a2;
+  --md-outline-variant: #746c5e;
+  --md-primary: var(--sketch-accent);
+  --md-on-primary: #141414;
+  --md-primary-container: #40241b;
+  --md-on-primary-container: #ffd8cb;
+  --md-secondary-container: #2f2a23;
+  --md-on-secondary-container: #f0ece0;
+  --preview-dark: #171717;
+  --preview-light: #22211f;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--sketch-paper);
+  background: var(--sketch-bg);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 100%);
+  background-size: 4px 4px, 6px 6px;
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.app-header,
+.controls-panel,
+.workspace-panel,
+.ctrl-section,
+.preview-card,
+.output-group,
+.preview-meta,
+.preview-toolbar,
+.field-input,
+.field-select,
+.field-color,
+.toggle-item,
+.icon-btn,
+.action-btn,
+.output-header,
+.code-copy-btn,
+.icon-tile,
+.upload-zone,
+.toast,
+.g-item,
+.gallery-item {
+  position: relative;
+  border: 2px dashed color-mix(in srgb, var(--sketch-paper) 70%, transparent);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  filter: url(#sketch-rough);
+}
+
+h1,
+h2,
+h3,
+.brand-title,
+.workspace-title,
+.controls-heading,
+.ctrl-title,
+button,
+.action-btn,
+.preset-btn {
+  font-family: 'Permanent Marker', 'Caveat', cursive;
+  letter-spacing: 0.02em;
+}
+
+p,
+label,
+input,
+select,
+textarea,
+.brand-sub,
+.controls-note,
+.preview-label,
+.workspace-note,
+.badge-dimensions,
+.toast {
+  font-family: 'Patrick Hand', 'Caveat', cursive;
+}
+
+.preview-card,
+.controls-panel,
+.ctrl-section,
+.output-group,
+.g-item,
+.gallery-item,
+.action-btn,
+.icon-btn,
+.preset-btn,
+.toggle-item,
+.upload-zone,
+.field-input,
+.field-select,
+.field-color {
+  border-radius: 10px;
+}
+
+.controls-panel,
+.ctrl-section,
+.preview-card,
+.output-group,
+.g-item,
+.gallery-item,
+.upload-zone {
+  transform: rotate(-0.4deg);
+}
+
+.action-btn,
+.icon-btn,
+.preset-btn,
+.toggle-item,
+.code-copy-btn {
+  transform: rotate(0.5deg);
+  background: color-mix(in srgb, var(--sketch-panel-2) 85%, transparent);
+}
+
+.action-btn:hover,
+.icon-btn:hover,
+.preset-btn:hover,
+.toggle-item:hover,
+.code-copy-btn:hover {
+  background: color-mix(in srgb, var(--sketch-accent) 20%, var(--sketch-panel));
+  border-color: var(--sketch-accent);
+}
+
+.brand-logo,
+.controls-kicker,
+.workspace-kicker,
+.action-btn--primary,
+.preset-btn.active,
+.toggle-item.active {
+  color: var(--sketch-accent);
+}
+
+.preview-stage.checker {
+  background-image:
+    linear-gradient(45deg, rgba(240, 236, 224, 0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(240, 236, 224, 0.05) 25%, transparent 25%);
+  background-size: 24px 24px;
+}
