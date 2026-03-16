@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="186" height="32" role="img" aria-label="🚀 RELEASE: V2.1.0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="186" height="32" role="img" aria-label="🚀 RELEASE: V2.1.0">
 
 <rect x="0" y="0" width="106" height="32" fill="#7c2d12" rx="5" ry="5" />
 <rect x="106" y="0" width="80" height="32" fill="#9a3412" rx="5" ry="5" />
 <rect x="101" y="0" width="5" height="32" fill="#7c2d12" />
+
 <text x="53.0" y="20.62" fill="#ffedd5" font-size="14" font-family="Verdana,DejaVu Sans,sans-serif" font-weight="700" text-anchor="middle">🚀 RELEASE</text>
 <text x="146.0" y="20.62" fill="#fde68a" font-size="14" font-family="Verdana,DejaVu Sans,sans-serif" font-weight="700" text-anchor="middle">V2.1.0</text>
 
