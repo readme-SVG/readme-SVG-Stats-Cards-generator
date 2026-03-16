@@ -219,8 +219,15 @@ git diff --exit-code
 
 1. Open the hosted app: `https://readme-svg-custom-badge-generator.vercel.app`.
 2. Configure label/value/style/theme/size/icon.
-3. Copy generated SVG or download it directly.
-4. Embed in your README.
+3. **Download** the generated SVG file.
+4. Commit the SVG file to your repository (e.g. in a `badges/` or `assets/` folder).
+5. Reference it in your README by file path:
+
+```markdown
+![build badge](badges/badge-build.svg)
+```
+
+> **Note:** GitHub does not render `data:` URIs in markdown for security reasons. Always reference badges by file path or URL — not by inline base64.
 
 ### Python CLI
 

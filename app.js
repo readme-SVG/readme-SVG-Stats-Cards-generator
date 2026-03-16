@@ -343,10 +343,15 @@ function render() {
       `${svgEl.getAttribute('width')} × ${svgEl.getAttribute('height')} px`;
   }
 
-  /* Markdown output */
+  /* Markdown output — use file path instead of data URI (GitHub blocks data URIs) */
   const label = state.label || 'label';
   const alt   = `${label} badge`;
-  document.getElementById('outputMarkdown').value = `![${alt}](data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))})`;
+  const slug  = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const fname = `badge-${slug}.svg`;
+  document.getElementById('outputMarkdown').value = `![${alt}](${fname})\n\n<!-- Download the SVG file, commit it to your repo, and reference by path -->\n<!-- Example with subdirectory: ![${alt}](assets/badges/${fname}) -->`;
+
+  /* HTML <img> output */
+  document.getElementById('outputHtml').value = `<img src="${fname}" alt="${alt}" />`;
 
   /* SVG output */
   document.getElementById('outputSvg').value = svg;
@@ -793,8 +798,8 @@ function initActions() {
   });
 
   document.getElementById('btnDownloadSvg').addEventListener('click', () => {
-    const name = `badge-${(state.label || 'label').replace(/\s+/g, '-')}-${Date.now()}.svg`;
-    downloadSVG(_currentSvg, name);
+    const slug = (state.label || 'label').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    downloadSVG(_currentSvg, `badge-${slug}.svg`);
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
