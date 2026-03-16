@@ -1255,6 +1255,13 @@ details.ctrl-section[open] .ctrl-chevron {
 .output-textarea:hover  { border-color: var(--md-outline); }
 .output-textarea:focus  { border-color: var(--md-primary); border-width: 2px; }
 
+.output-hint {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant, #888);
+  line-height: 1.3;
+}
+
 /* ─── Gallery (MD3 Cards) ────────────────────────────────────── */
 .gallery-section {
   display: flex;

@@ -346,10 +346,19 @@
       <div class="output-grid">
         <div class="output-group">
           <div class="output-header">
-            <label class="output-label" for="outputMarkdown">Markdown</label>
+            <label class="output-label" for="outputMarkdown">Markdown (GitHub-compatible)</label>
             <button class="output-copy-btn" data-target="outputMarkdown" aria-label="Copy markdown">Copy</button>
           </div>
           <textarea class="output-textarea" id="outputMarkdown" readonly spellcheck="false"></textarea>
+          <p class="output-hint">Download the SVG, commit it to your repo, then use the file path in markdown.</p>
+        </div>
+
+        <div class="output-group">
+          <div class="output-header">
+            <label class="output-label" for="outputHtml">HTML <img> tag</label>
+            <button class="output-copy-btn" data-target="outputHtml" aria-label="Copy HTML">Copy</button>
+          </div>
+          <textarea class="output-textarea" id="outputHtml" readonly spellcheck="false"></textarea>
         </div>
 
         <div class="output-group">
