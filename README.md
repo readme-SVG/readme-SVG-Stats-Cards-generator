@@ -1,19 +1,18 @@
-# Badge Forge — SVG Custom Badge Generator
+# Badge Forge — SVG Status Badge Toolkit
 
-A zero-backend, production-ready badge generation toolkit for README-driven observability, release tracking, and developer workflow telemetry.
+A deterministic, production-oriented badge generation library and service for surfacing build, release, coverage, and operational logging signals directly in README files.
 
-[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel)](https://readme-svg-custom-badge-generator.vercel.app)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?style=for-the-badge&logo=flask)](https://pypi.org/project/Flask/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/OstinFCT/readme-SVG-custom-badge-generator/lint.yml?style=for-the-badge&label=Build)](https://github.com/OstinFCT/readme-SVG-custom-badge-generator/actions)
+[![Version](https://img.shields.io/github/v/release/OstinFCT/readme-SVG-custom-badge-generator?style=for-the-badge)](https://github.com/OstinFCT/readme-SVG-custom-badge-generator/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Client--Side%20Generator-7c3aed?style=for-the-badge)](#features)
+[![Coverage](https://img.shields.io/badge/Coverage-Scripted%20Regression-7c3aed?style=for-the-badge)](#testing)
 
 > [!NOTE]
-> Although this repository includes Python rendering modules, the primary product experience is now fully client-side and suitable for static hosting.
+> This repository provides a browser-first badge generator, a TypeScript HTTP service, and Python tooling. There is no mandatory always-on backend for core usage.
 
 ## Table of Contents
 
-- [Badge Forge — SVG Custom Badge Generator](#badge-forge--svg-custom-badge-generator)
+- [Badge Forge — SVG Status Badge Toolkit](#badge-forge--svg-status-badge-toolkit)
 - [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Tech Stack & Architecture](#tech-stack--architecture)
@@ -26,119 +25,139 @@ A zero-backend, production-ready badge generation toolkit for README-driven obse
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Usage](#usage)
-  - [Web UI (recommended)](#web-ui-recommended)
-  - [Python CLI](#python-cli)
-  - [README Embedding Example](#readme-embedding-example)
+  - [Basic Usage](#basic-usage)
 - [Configuration](#configuration)
-  - [Environment Variables](#environment-variables)
-  - [CLI Flags](#cli-flags)
-  - [Badge Rendering Parameters](#badge-rendering-parameters)
 - [License](#license)
 - [Support the Project](#support-the-project)
 
 ## Features
 
-- Zero-server SVG badge generation workflow (browser-first architecture).
-- Interactive badge editor with real-time rendering preview.
-- Built-in presets for common pipeline signals: `build`, `coverage`, `release`, `docs`, `quality`.
-- Rich style system with multiple profiles (`flat`, `plastic`, `for-the-badge`, `pill`, etc.).
-- Theme and palette support for controlled visual consistency.
-- Optional uppercase, compact mode, and gradient overlay.
-- Icon rendering support with built-in icon catalog and custom data URI icon payloads (Python renderer).
-- Deterministic sizing model (`xs` → `xl`) with additional numeric `scale` control.
-- Ready-to-copy SVG output for direct embedding into GitHub README files.
-- Static-hosting compatible deployment path (Vercel-friendly configuration).
-- Auxiliary Python scripts for offline generation and sample artifact refresh.
+- Deterministic SVG rendering across JavaScript (`app.js`), TypeScript server (`server/services/badgeRenderer.ts`), and Python (`api/github_stats.py`).
+- Multiple rendering profiles (`flat`, `flat-square`, `for-the-badge`, `plastic`, `social`, `rounded`, `pill`, `outline`, `soft`).
+- Theme-aware palette model with overridable segment and text colors.
+- Preset system optimized for common operational and release telemetry (`build`, `coverage`, `release`, `docs`, `quality`).
+- Built-in icon registry plus custom icon upload/data URI support.
+- Shields.io-compatible path endpoint (`/badge/<label>-<value>`) for URL-based embedding workflows.
+- Query-based endpoint with rich parameterization (`/badge?...`) for runtime badge synthesis.
+- Safe defaults and input guards (hex color validation, bounded scaling, icon payload limits).
+- Optional gradient overlays, uppercase rendering, compact mode, and rounded geometry control.
+- Static frontend delivery compatible with Vercel, plus optional Express service for API workflows.
+- Local CLI utility (`process_event.py`) for scripted generation in CI/CD.
+- Sample artifact regeneration workflow for reproducible visual baselines.
 
 > [!TIP]
-> Use the hosted instance for fastest onboarding: https://readme-svg-custom-badge-generator.vercel.app
+> Use the web app for interactive badge design, then promote stable output into versioned SVG artifacts in your repository.
 
 ## Tech Stack & Architecture
 
 ### Core Stack
 
-- **Frontend:** Vanilla JavaScript, HTML5, CSS3.
-- **Rendering Engine:** Deterministic SVG synthesis in browser (`app.js`) and Python parity renderer (`api/github_stats.py`).
-- **Backend Runtime (optional tooling path):** Python 3.10+ with Flask and `python-dotenv`.
-- **Deployment Target:** Static hosting (Vercel).
-- **Artifact Automation:** Python utility script for batch sample badge regeneration.
+- `JavaScript` + `HTML` + `CSS` for the browser rendering surface.
+- `TypeScript` + `Express` for optional HTTP badge generation APIs.
+- `Python 3.10+` for CLI and script-driven SVG generation.
+- `Vercel` for static hosting/deployment.
+- `GitHub Actions` for repository automation workflows.
 
 ### Project Structure
+
+<details>
+<summary>Expand file tree</summary>
 
 ```text
 .
 ├── api/
-│   ├── data_fetchers.py           # Presets/catalog data provider
-│   └── github_stats.py            # Python SVG generation engine
+│   ├── badge.js
+│   ├── data_fetchers.py
+│   └── github_stats.py
 ├── scripts/
-│   └── refresh_sample_svgs.py     # Rebuild sample SVGs from canonical presets
+│   └── refresh_sample_svgs.py
 ├── sample_svgs/
 │   ├── sample_build.svg
 │   ├── sample_coverage.svg
 │   ├── sample_docs.svg
 │   ├── sample_quality.svg
 │   └── sample_release.svg
-├── app.js                         # Browser-side badge generator + UI state manager
-├── index.html                     # Main application shell
-├── styles.css                     # UI styling system
-├── process_event.py               # CLI utility for generating a single SVG badge
-├── requirements.txt               # Python dependency pinning
-├── vercel.json                    # Static deployment routing config
+├── server/
+│   ├── controllers/
+│   │   └── badgeController.ts
+│   ├── routes/
+│   │   └── routes.ts
+│   ├── services/
+│   │   ├── badgeRenderer.ts
+│   │   └── iconService.ts
+│   ├── index.ts
+│   ├── package.json
+│   └── tsconfig.json
+├── trigger action/
+│   └── trigger_action.py
+├── app.js
+├── index.html
+├── process_event.py
+├── requirements.txt
+├── styles.css
+├── vercel.json
 └── README.md
 ```
 
+</details>
+
 ### Key Design Decisions
 
-1. **Client-first rendering path**
-   - Badge generation is executed in-browser for zero infrastructure cost and near-instant response.
-   - Eliminates runtime API dependencies for most user journeys.
-
-2. **Renderer parity model (JS + Python)**
-   - JavaScript engine mirrors the Python rendering logic and style constants.
-   - Enables deterministic output whether generated in UI or scripted workflows.
-
-3. **Static-first deployment strategy**
-   - Repository is structured for static asset delivery.
-   - Simplifies CI/CD and reduces deployment surface area.
-
-4. **Composable style primitives**
-   - Styles, themes, icons, and presets are modeled as declarative maps.
-   - New badge variants can be added with minimal rendering pipeline changes.
+1. **Renderer parity over single-language lock-in**
+   - Rendering logic is intentionally mirrored between browser JS, server TS, and Python to keep output stable across usage modes.
+2. **Static-first default architecture**
+   - Core user workflow requires only static assets; backend services are additive, not mandatory.
+3. **Composable style system**
+   - Style profile + theme palette + runtime overrides provide extensibility without engine rewrites.
+4. **Operational safety controls**
+   - Input constraints and icon payload limits reduce rendering abuse and oversized SVG outputs.
 
 ```mermaid
 flowchart LR
-    A[User Input: label/value/style/theme] --> B[State Model]
-    B --> C[Validation & Normalization]
-    C --> D[SVG Layout Calculation]
-    D --> E[SVG String Generation]
-    E --> F[Live Preview]
-    E --> G[Copy or Download]
-
-    subgraph Optional Python Tooling
-      H[CLI Params] --> I[generate_custom_badge]
-      I --> J[SVG File Output]
-    end
+    A[User Input: preset/label/value] --> B[Normalize Params]
+    B --> C{Runtime Path}
+    C -->|Browser| D[app.js Renderer]
+    C -->|API| E[Express Controller]
+    E --> F[badgeRenderer.ts]
+    C -->|CLI| G[process_event.py]
+    G --> H[github_stats.py]
+    D --> I[SVG Output]
+    F --> I
+    H --> I
+    I --> J[README Embed / CI Artifact / Download]
 ```
 
+<details>
+<summary>Architecture deep-dive: endpoint behavior and request lifecycle</summary>
+
+- `GET /badge`: Consumes query parameters and returns `image/svg+xml`.
+- `GET /badge/*`: Parses path format (`label-value`) and delegates to the same generation pipeline.
+- `GET /list.json`: Returns runtime catalog (icons, styles, themes, sizes, presets).
+- `POST /icon`: Registers custom icon payloads with request-rate limiting and size guards.
+- GET responses are emitted with short caching headers (`max-age=300`) for predictable refresh behavior.
+
+</details>
+
 > [!IMPORTANT]
-> The web app is fully operational without standing up Flask routes. Python modules are useful for scripted generation and regression workflows.
+> For reproducibility, prefer pinned presets and checked-in SVG files over purely dynamic badge URLs.
 
 ## Getting Started
 
 ### Prerequisites
 
-- **For web usage:** Any modern browser (Chromium, Firefox, Safari).
-- **For local static hosting:** Python 3.10+ (for `http.server`).
-- **For Python tooling:** `pip`, virtual environment support (`venv`).
+- `Node.js >= 18` (for TypeScript server mode).
+- `npm` (for server dependencies/build).
+- `Python >= 3.10` + `pip` (for CLI and script workflows).
+- Modern browser for interactive UI usage.
 
 ### Installation
 
 ```bash
-git clone https://github.com/<your-org-or-user>/readme-SVG-custom-badge-generator.git
+git clone https://github.com/OstinFCT/readme-SVG-custom-badge-generator.git
 cd readme-SVG-custom-badge-generator
 ```
 
-Install Python dependencies (optional, for CLI/scripts):
+Install Python dependencies (optional but recommended):
 
 ```bash
 python -m venv .venv
@@ -146,92 +165,111 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Run static app locally:
+Install server dependencies (optional API mode):
+
+```bash
+cd server
+npm install
+cd ..
+```
+
+Run static UI locally:
 
 ```bash
 python -m http.server 8080
 ```
 
-Open: `http://localhost:8080`
+Open `http://localhost:8080`.
+
+<details>
+<summary>Troubleshooting and alternative setup paths</summary>
+
+- If `python` resolves to Python 2, use `python3`.
+- If `npm install` fails due to engine mismatch, verify `node -v` is `18+`.
+- To run server mode in development:
+  ```bash
+  cd server
+  npm run dev
+  ```
+- To run production server build:
+  ```bash
+  cd server
+  npm run build
+  npm start
+  ```
+
+</details>
 
 ## Testing
 
-Current repository checks are primarily script-based and deterministic artifact generation checks.
+Run deterministic checks locally:
 
-1. **Python syntax sanity checks**
 ```bash
 python -m py_compile api/github_stats.py api/data_fetchers.py process_event.py scripts/refresh_sample_svgs.py
-```
-
-2. **Sample generation regression pass**
-```bash
 python scripts/refresh_sample_svgs.py
-```
-
-3. **Single badge generation smoke test**
-```bash
 python process_event.py --label build --value passing --style flat --theme terminal --output badge-smoke.svg
 ```
 
-4. **Recommended lint/format commands (if configured in your environment)**
+Run server build validation:
+
+```bash
+cd server
+npm run build
+cd ..
+```
+
+Optional style/lint checks:
+
 ```bash
 black .
 flake8 .
 ```
 
 > [!WARNING]
-> A formal `pytest` suite is not currently included in this repository. If you introduce parser, rendering, or layout logic changes, add regression tests alongside your PR.
+> A full unit/integration test suite is not yet present; current validation is generation-oriented and compile/build oriented.
 
 ## Deployment
 
 ### Static Deployment (Recommended)
 
-This project is configured for static hosting and works out of the box on Vercel.
+Use Vercel to publish the frontend artifact directly:
 
 ```bash
 vercel
 vercel --prod
 ```
 
-`vercel.json` maps root requests to `index.html`, making the frontend deployable with no backend runtime.
-
-### CI/CD Integration Guidelines
-
-- Validate syntax and regenerate samples in CI:
+### Server Deployment (Optional)
 
 ```bash
-python -m py_compile api/github_stats.py api/data_fetchers.py process_event.py scripts/refresh_sample_svgs.py
-python scripts/refresh_sample_svgs.py
+cd server
+npm install
+npm run build
+npm start
 ```
 
-- Optionally fail CI on dirty sample artifacts to enforce deterministic output:
+Expose port `5000` (or set `PORT`) in your runtime environment.
 
-```bash
-git diff --exit-code
-```
+### CI/CD Integration Guidance
+
+- Add a Python compile + sample regeneration stage.
+- Add TypeScript build checks for server integrity.
+- Enforce clean working tree after artifact generation (`git diff --exit-code`).
 
 > [!CAUTION]
-> If you rely on generated sample files as reference artifacts, ensure your CI environment uses a consistent Python version to avoid formatting drift.
+> Dynamic badge endpoints are cacheable and externally consumable; review rate-limits and payload controls before public exposure.
 
 ## Usage
 
-### Web UI (recommended)
+### Basic Usage
 
-1. Open the hosted app: `https://readme-svg-custom-badge-generator.vercel.app`.
-2. Configure label/value/style/theme/size/icon.
-3. **Download** the generated SVG file.
-4. Commit the SVG file to your repository (e.g. in a `badges/` or `assets/` folder).
-5. Reference it in your README by file path:
+Generate a badge through the HTTP API:
 
-```markdown
-![build badge](badges/badge-build.svg)
+```bash
+curl "http://localhost:5000/badge?label=logging&value=healthy&style=flat&theme=terminal" -o logging-health.svg
 ```
 
-> **Note:** GitHub does not render `data:` URIs in markdown for security reasons. Always reference badges by file path or URL — not by inline base64.
-
-### Python CLI
-
-Generate a badge from terminal:
+Generate a badge through CLI:
 
 ```bash
 python process_event.py \
@@ -244,77 +282,104 @@ python process_event.py \
   --output "logging-status.svg"
 ```
 
-### README Embedding Example
+Embed in GitHub Markdown:
 
 ```markdown
-<!-- Example badge generated via Badge Forge web app -->
-![Build Badge](./sample_svgs/sample_build.svg)
-
-<!-- External shield-style variant for release channel -->
-[![Release Channel](https://img.shields.io/badge/release-stable-22c55e?style=for-the-badge)](#)
+![logging status](./logging-status.svg)
 ```
 
+<details>
+<summary>Advanced Usage: query parameters, custom formatters, and edge cases</summary>
+
+### Query-driven customization
+
+```bash
+curl "http://localhost:5000/badge?label=logs&value=ingest%20ok&icon=rocket&style=pill&theme=neon&size=lg&uppercase=1&compact=1"
+```
+
+### Path format for Shields-style URLs
+
+```bash
+curl "http://localhost:5000/badge/logs-ingest__ok?style=flat-square&theme=dark"
+```
+
+### JavaScript integration example
+
 ```js
-// Browser-side generation flow (conceptual usage)
 const svg = generateBadge({
-  label: 'logger',
-  value: 'v2.1.0',
-  style: 'pill',
-  theme: 'neon',
-  size: 'lg',
-  uppercase: false,
-  gradient: true,
+  label: 'logging',
+  value: 'rate limited',
+  style: 'outline',
+  theme: 'dark',
+  borderColor: '#ef4444',
+  compact: true,
 });
 
-// Save or copy the SVG payload
 console.log(svg);
 ```
 
+### Edge-case guidance
+
+- Keep label/value strings concise to avoid oversized visual output.
+- Use hex colors only (`#RRGGBB`) for reliable fallback behavior.
+- For custom icons, validate MIME and keep base64 payloads small.
+
+</details>
+
 ## Configuration
+
+Runtime controls can be applied via query params, CLI flags, and optional environment variables.
 
 ### Environment Variables
 
-There are no mandatory runtime environment variables for the static app.
+| Variable | Required | Scope | Purpose | Example |
+|---|---|---|---|---|
+| `PORT` | No | Server | Express listen port | `5000` |
+| `PYTHONPATH` | No | Tooling | Import path extension for scripts | `./api` |
 
-Optional conventions you may use in tooling/CI:
-
-| Variable | Required | Purpose | Example |
-|---|---|---|---|
-| `PYTHONPATH` | No | Explicitly include `api/` modules in custom scripts | `PYTHONPATH=./api` |
-| `PORT` | No | Local static server binding when using custom server commands | `PORT=8080` |
-
-### CLI Flags
-
-`process_event.py` supports the following startup flags:
+### Startup Flags (`process_event.py`)
 
 | Flag | Type | Default | Description |
 |---|---|---|---|
 | `--label` | string | `build` | Left segment text |
 | `--value` | string | `passing` | Right segment text |
-| `--icon` | string | `check` | Built-in icon key |
-| `--style` | string | `flat` | Badge style profile |
-| `--theme` | string | `dark` | Color theme key |
-| `--output` | path | `badge.svg` | Output SVG file path |
-| `--uppercase` | bool flag | `false` | Force uppercase rendering |
-| `--compact` | bool flag | `false` | Apply compact width factor |
-| `--gradient` | bool flag | `false` | Enable glossy overlay effect |
+| `--icon` | string | `check` | Icon key |
+| `--style` | string | `flat` | Style profile |
+| `--theme` | string | `dark` | Palette theme |
+| `--output` | path | `badge.svg` | Output file |
+| `--uppercase` | flag | `false` | Force uppercase output |
+| `--compact` | flag | `false` | Condensed width layout |
+| `--gradient` | flag | `false` | Gradient overlay |
 
-### Badge Rendering Parameters
+<details>
+<summary>Exhaustive HTTP configuration matrix</summary>
 
-Both JS and Python engines use shared conceptual parameters:
+| Parameter | Type | Default | Allowed Values / Constraints | Notes |
+|---|---|---|---|---|
+| `preset` | string | none | `build`, `coverage`, `release`, `docs`, `quality` | Seeds baseline values |
+| `label` | string | `build` | max ~40 chars | Left segment content |
+| `value` | string | `passing` | max ~52 chars | Right segment content |
+| `icon` | string | `none` | Built-in key or custom slug | Resolved via icon service |
+| `iconData` | string | none | data URI, size-limited | Prefer validated payloads |
+| `style` | string | `flat` | profile keys in renderer | Impacts height, radius, weight |
+| `theme` | string | `dark` | theme keys in renderer | Provides fallback palette |
+| `size` | string | `md` | `xs`,`sm`,`md`,`lg`,`xl` | Base scale multiplier |
+| `scale` | float | `1.0` | clamped `0.7..2.0` | Additional width/height scaling |
+| `labelBg` | hex color | theme-derived | `#RRGGBB` | Left background override |
+| `valueBg` | hex color | theme-derived | `#RRGGBB` | Right background override |
+| `labelColor` | hex color | theme-derived | `#RRGGBB` | Left text override |
+| `valueColor` | hex color | theme-derived | `#RRGGBB` | Right text override |
+| `borderColor` | hex color | theme-derived | `#RRGGBB` | Used by bordered styles |
+| `borderRadius` | int | style-defined | clamped `0..999` | Optional custom radius |
+| `gradient` | bool | `false` | `1/true` or `0/false` | Adds glossy overlay |
+| `uppercase` | bool | `false` | `1/true` or `0/false` | Forces upper-case text |
+| `compact` | bool | `false` | `1/true` or `0/false` | Reduces padding footprint |
 
-- **Text:** `label`, `value`
-- **Layout:** `size`, `scale`, `border_radius`, `compact`
-- **Visuals:** `style`, `theme`, `label_bg`, `value_bg`, `label_color`, `value_color`, `border_color`
-- **Behavior:** `uppercase`, `gradient`
-- **Icon:** `icon` and optional custom `icon_data` (data URI)
-
-> [!NOTE]
-> Custom icon payloads should be validated and size-limited to avoid oversized SVG artifacts in READMEs.
+</details>
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for full terms.
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE) for complete terms.
 
 ## Support the Project
 
