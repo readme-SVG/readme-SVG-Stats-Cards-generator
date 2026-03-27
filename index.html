@@ -265,7 +265,12 @@
         <div class="ctrl-section-body">
           <div class="icon-picker-grid" id="iconPickerGrid" role="group" aria-label="Built-in icons"></div>
           <div class="icon-upload-area">
-            <label class="field-label" for="iconFileInput">Custom image</label>
+            <label class="field-label" for="iconUrlInput">Custom image URL</label>
+            <div class="field" style="margin-bottom:8px">
+              <input class="field-input" id="iconUrlInput" type="url" placeholder="https://raw.githubusercontent.com/..." autocomplete="off" />
+              <p class="output-hint" style="margin-top:4px">Public image URL — fetched server-side for the markdown badge.</p>
+            </div>
+            <label class="field-label" for="iconFileInput">Or upload for local preview</label>
             <div class="icon-upload-row">
               <label class="upload-btn" for="iconFileInput">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>

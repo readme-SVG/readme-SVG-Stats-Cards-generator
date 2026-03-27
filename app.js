@@ -122,6 +122,7 @@ function generateBadge(opts) {
     value       = 'passing',
     icon        = 'none',
     iconData    = '',        // base64 data URI of custom uploaded image
+    iconUrl     = '',        // public URL for custom icon (used in live preview)
     style       = 'flat',
     theme       = 'dark',
     size        = 'md',
@@ -146,7 +147,10 @@ function generateBadge(opts) {
   const rawValue = String(value || 'value').slice(0, 52);
 
   /* ── Icon resolution ── */
-  const hasCustomIcon = typeof iconData === 'string' && iconData.startsWith('data:image/');
+  const hasDataIcon = typeof iconData === 'string' && iconData.startsWith('data:image/');
+  const hasUrlIcon = typeof iconUrl === 'string' && iconUrl.startsWith('https://');
+  const hasCustomIcon = hasDataIcon || hasUrlIcon;
+  const customIconHref = hasDataIcon ? iconData : (hasUrlIcon ? iconUrl : '');
   const symbol = hasCustomIcon ? '' : (ICONS[icon] || '');
   const fullLabelText = (symbol && !hasCustomIcon) ? `${symbol} ${rawLabel}`.trim() : rawLabel;
 
@@ -220,7 +224,7 @@ function generateBadge(opts) {
   if (hasCustomIcon) {
     const ix = padX;
     const iy = (height - iconSize) / 2;
-    iconSvg    = `<image x="${ix}" y="${iy}" width="${iconSize}" height="${iconSize}" href="${esc(iconData)}"/>`;
+    iconSvg    = `<image x="${ix}" y="${iy}" width="${iconSize}" height="${iconSize}" href="${esc(customIconHref)}"/>`;
     labelTextX = iconTotalSpace + padX + textWidth(labelRender, fontSize) / 2;
   }
 
@@ -251,6 +255,7 @@ const DEFAULT_STATE = {
   value:        'passing',
   icon:         'check',
   iconData:     '',
+  iconUrl:      '',
   style:        'flat',
   theme:        'terminal',
   size:         'md',
@@ -358,7 +363,7 @@ function render() {
   query.set('icon', state.icon || 'none');
   query.set('scale', String(state.scale ?? 1));
 
-  if (state.iconData) query.set('iconData', state.iconData);
+  if (state.iconUrl) query.set('iconUrl', state.iconUrl);
   if (state.labelBg) query.set('labelBg', state.labelBg);
   if (state.valueBg) query.set('valueBg', state.valueBg);
   if (state.labelColor) query.set('labelColor', state.labelColor);
@@ -559,7 +564,9 @@ function initIconPicker() {
 
     btn.addEventListener('click', () => {
       state.icon = key;
-      state.iconData = ''; // clear custom upload
+      state.iconData = '';
+      state.iconUrl = '';
+      document.getElementById('iconUrlInput').value = '';
       document.getElementById('iconFileInput').value = '';
       document.getElementById('iconPreviewImg').hidden = true;
       document.getElementById('iconClearBtn').hidden = true;
@@ -572,9 +579,10 @@ function initIconPicker() {
   }
 
   /* File upload */
-  const fileInput  = document.getElementById('iconFileInput');
-  const previewImg = document.getElementById('iconPreviewImg');
-  const clearBtn   = document.getElementById('iconClearBtn');
+  const fileInput    = document.getElementById('iconFileInput');
+  const previewImg   = document.getElementById('iconPreviewImg');
+  const clearBtn     = document.getElementById('iconClearBtn');
+  const iconUrlInput = document.getElementById('iconUrlInput');
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
@@ -596,7 +604,9 @@ function initIconPicker() {
         const dataUrl   = canvas.toDataURL('image/png');
 
         state.iconData  = dataUrl;
+        state.iconUrl   = '';
         state.icon      = 'none';
+        iconUrlInput.value = '';
         previewImg.src  = dataUrl;
         previewImg.hidden = false;
         clearBtn.hidden = false;
@@ -610,8 +620,25 @@ function initIconPicker() {
     reader.readAsDataURL(file);
   });
 
+  /* Icon URL input */
+  iconUrlInput.addEventListener('input', () => {
+    const url = iconUrlInput.value.trim();
+    state.iconUrl = url;
+    if (url) {
+      state.icon = 'none';
+      grid.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+      // Show URL-sourced preview
+      previewImg.src = url;
+      previewImg.hidden = false;
+      clearBtn.hidden = false;
+    }
+    render();
+  });
+
   clearBtn.addEventListener('click', () => {
     state.iconData  = '';
+    state.iconUrl   = '';
+    iconUrlInput.value = '';
     fileInput.value = '';
     previewImg.hidden = true;
     clearBtn.hidden   = true;
@@ -636,6 +663,7 @@ function applyPreset(name) {
   state.value        = p.value;
   state.icon         = p.icon;
   state.iconData     = '';
+  state.iconUrl      = '';
   state.style        = p.style;
   state.theme        = p.theme;
   state.size         = p.size || 'md';
@@ -700,7 +728,8 @@ function syncAllFieldsFromState() {
   });
 
   /* Clear custom icon */
-  if (!state.iconData) {
+  document.getElementById('iconUrlInput').value = state.iconUrl || '';
+  if (!state.iconData && !state.iconUrl) {
     const fi = document.getElementById('iconFileInput');
     if (fi) fi.value = '';
     document.getElementById('iconPreviewImg').hidden = true;
