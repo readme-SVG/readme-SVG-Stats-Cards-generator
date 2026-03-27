@@ -1,10 +1,20 @@
 {
-  "headers": [
+  "version": 2,
+  "builds": [
+    { "src": "api/badge.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "styles.css", "use": "@vercel/static" },
+    { "src": "sample_svgs/**", "use": "@vercel/static" }
+  ],
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
-      ]
-    }
+      "src": "/api/badge",
+      "dest": "/api/badge.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    { "handle": "filesystem" }
   ]
 }
