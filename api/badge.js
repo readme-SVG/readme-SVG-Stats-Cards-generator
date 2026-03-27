@@ -29,7 +29,7 @@ const ICONS = {
   bolt: '⚡', rocket: '🚀', code: '⌘', build: '⚙', docs: '📘',
 };
 
-const DATA_URI_RE = /^data:image\/(?:png|jpeg|gif|svg\+xml|webp);base64,[A-Za-z0-9+/=]+$/;
+const DATA_URI_RE = /^data:image\/[a-zA-Z0-9+\-]+;base64,[A-Za-z0-9+/=]+$/;
 const MAX_ICON_DATA_LEN = 200000;
 
 function esc(s) {
@@ -176,23 +176,12 @@ ${overlay}
 </svg>`.trim();
 }
 
-const ALLOWED_ICON_HOSTS = [
-  'raw.githubusercontent.com',
-  'github.com',
-  'avatars.githubusercontent.com',
-  'user-images.githubusercontent.com',
-  'cdn.jsdelivr.net',
-  'cdn.simpleicons.org',
-  'img.shields.io',
-];
-
 const MAX_ICON_FETCH_BYTES = 200000;
 const ICON_FETCH_TIMEOUT_MS = 3000;
 
 async function fetchIconAsDataUri(url) {
   const parsed = new URL(url);
   if (parsed.protocol !== 'https:') return null;
-  if (!ALLOWED_ICON_HOSTS.includes(parsed.hostname)) return null;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ICON_FETCH_TIMEOUT_MS);
@@ -200,16 +189,28 @@ async function fetchIconAsDataUri(url) {
   try {
     const resp = await fetch(url, {
       signal: controller.signal,
-      headers: { 'Accept': 'image/*' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; CustomBadgeGenerator/1.0)',
+        'Accept': 'image/*, */*',
+      },
       redirect: 'follow',
     });
     clearTimeout(timer);
 
     if (!resp.ok) return null;
 
-    const contentType = (resp.headers.get('content-type') || '').split(';')[0].trim();
-    const allowed = ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml', 'image/webp'];
-    if (!allowed.includes(contentType)) return null;
+    let contentType = (resp.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    const path = url.toLowerCase().split('?')[0];
+
+    if (!contentType || contentType === 'text/plain' || contentType === 'application/octet-stream') {
+      if (path.endsWith('.svg')) contentType = 'image/svg+xml';
+      else if (path.endsWith('.png')) contentType = 'image/png';
+      else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) contentType = 'image/jpeg';
+      else if (path.endsWith('.gif')) contentType = 'image/gif';
+      else if (path.endsWith('.webp')) contentType = 'image/webp';
+    }
+
+    if (!contentType.startsWith('image/')) return null;
 
     const buf = await resp.arrayBuffer();
     if (buf.byteLength > MAX_ICON_FETCH_BYTES) return null;
