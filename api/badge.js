@@ -29,7 +29,7 @@ const ICONS = {
   bolt: '⚡', rocket: '🚀', code: '⌘', build: '⚙', docs: '📘',
 };
 
-const DATA_URI_RE = /^data:image\/[a-zA-Z0-9+\-]+;base64,[A-Za-z0-9+/=]+$/;
+const DATA_URI_RE = /^data:image\/[a-zA-Z0-9+\-]+;base64,[A-Za-z0-9+/=\s]+$/;
 const MAX_ICON_DATA_LEN = 200000;
 
 function esc(s) {
