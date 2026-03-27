@@ -364,6 +364,7 @@ function render() {
   query.set('scale', String(state.scale ?? 1));
 
   if (state.iconUrl) query.set('iconUrl', state.iconUrl);
+  if (state.iconData) query.set('iconData', state.iconData);
   if (state.labelBg) query.set('labelBg', state.labelBg);
   if (state.valueBg) query.set('valueBg', state.valueBg);
   if (state.labelColor) query.set('labelColor', state.labelColor);
@@ -592,15 +593,15 @@ function initIconPicker() {
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        /* Resize to 64×64 via canvas */
+        /* Resize to 32×32 via canvas */
         const canvas    = document.createElement('canvas');
-        canvas.width    = 64;
-        canvas.height   = 64;
+        canvas.width    = 32;
+        canvas.height   = 32;
         const ctx       = canvas.getContext('2d');
-        const s         = Math.min(64 / img.width, 64 / img.height);
+        const s         = Math.min(32 / img.width, 32 / img.height);
         const w         = img.width  * s;
         const h         = img.height * s;
-        ctx.drawImage(img, (64 - w) / 2, (64 - h) / 2, w, h);
+        ctx.drawImage(img, (32 - w) / 2, (32 - h) / 2, w, h);
         const dataUrl   = canvas.toDataURL('image/png');
 
         state.iconData  = dataUrl;
