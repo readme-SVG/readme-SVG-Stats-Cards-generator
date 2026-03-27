@@ -176,14 +176,70 @@ ${overlay}
 </svg>`.trim();
 }
 
-module.exports = function handler(req, res) {
+const ALLOWED_ICON_HOSTS = [
+  'raw.githubusercontent.com',
+  'github.com',
+  'avatars.githubusercontent.com',
+  'user-images.githubusercontent.com',
+  'cdn.jsdelivr.net',
+  'cdn.simpleicons.org',
+  'img.shields.io',
+];
+
+const MAX_ICON_FETCH_BYTES = 200000;
+const ICON_FETCH_TIMEOUT_MS = 3000;
+
+async function fetchIconAsDataUri(url) {
+  const parsed = new URL(url);
+  if (parsed.protocol !== 'https:') return null;
+  if (!ALLOWED_ICON_HOSTS.includes(parsed.hostname)) return null;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ICON_FETCH_TIMEOUT_MS);
+
+  try {
+    const resp = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'Accept': 'image/*' },
+      redirect: 'follow',
+    });
+    clearTimeout(timer);
+
+    if (!resp.ok) return null;
+
+    const contentType = (resp.headers.get('content-type') || '').split(';')[0].trim();
+    const allowed = ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml', 'image/webp'];
+    if (!allowed.includes(contentType)) return null;
+
+    const buf = await resp.arrayBuffer();
+    if (buf.byteLength > MAX_ICON_FETCH_BYTES) return null;
+
+    const base64 = Buffer.from(buf).toString('base64');
+    return `data:${contentType};base64,${base64}`;
+  } catch {
+    clearTimeout(timer);
+    return null;
+  }
+}
+
+module.exports = async function handler(req, res) {
   try {
     const q = req.query || {};
+
+    // Resolve icon data: prefer iconUrl (server-side fetch), fall back to iconData (legacy)
+    let resolvedIconData;
+    if (typeof q.iconUrl === 'string' && q.iconUrl.length > 0) {
+      resolvedIconData = await fetchIconAsDataUri(q.iconUrl);
+    } else if (typeof q.iconData === 'string' && q.iconData.length > 0) {
+      // Fix URL decoding: query params turn '+' into ' ', restore before validation
+      resolvedIconData = q.iconData.replace(/ /g, '+');
+    }
+
     const params = {
       label: typeof q.label === 'string' ? q.label : undefined,
       value: typeof q.value === 'string' ? q.value : undefined,
       icon: typeof q.icon === 'string' ? q.icon : undefined,
-      iconData: typeof q.iconData === 'string' ? q.iconData : undefined,
+      iconData: resolvedIconData || '',
       style: typeof q.style === 'string' ? q.style : undefined,
       theme: typeof q.theme === 'string' ? q.theme : undefined,
       size: typeof q.size === 'string' ? q.size : undefined,
