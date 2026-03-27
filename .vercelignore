@@ -1,5 +1,7 @@
 # Exclude legacy backend/python files from static deployment
-api/
+api/**/*.py
 scripts/
 requirements.txt
+server/
 *.py
+!api/**/*.js
