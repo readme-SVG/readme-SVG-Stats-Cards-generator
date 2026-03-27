@@ -343,15 +343,18 @@ function render() {
       `${svgEl.getAttribute('width')} × ${svgEl.getAttribute('height')} px`;
   }
 
-  /* Markdown output — use file path instead of data URI (GitHub blocks data URIs) */
-  const label = state.label || 'label';
-  const alt   = `${label} badge`;
-  const slug  = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const fname = `badge-${slug}.svg`;
-  document.getElementById('outputMarkdown').value = `![${alt}](${fname})\n\n<!-- Download the SVG file, commit it to your repo, and reference by path -->\n<!-- Example with subdirectory: ![${alt}](assets/badges/${fname}) -->`;
+  /* Markdown output — API endpoint returns animated SVG for README embeds */
+  const label = state.label || 'Animated ASCII';
+  const alt   = `${label} animated ascii`;
+  const apiUrl = new URL('/api/badge', window.location.origin);
+  apiUrl.searchParams.set('label', label);
+  apiUrl.searchParams.set('theme', state.theme || 'dark');
+  apiUrl.searchParams.set('profile', state.value || 'donut');
+  const markdownUrl = apiUrl.toString();
+  document.getElementById('outputMarkdown').value = `![${alt}](${markdownUrl})`;
 
   /* HTML <img> output */
-  document.getElementById('outputHtml').value = `<img src="${fname}" alt="${alt}" />`;
+  document.getElementById('outputHtml').value = `<img src="${markdownUrl}" alt="${alt}" />`;
 
   /* SVG output */
   document.getElementById('outputSvg').value = svg;
