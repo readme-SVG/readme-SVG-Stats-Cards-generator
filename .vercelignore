@@ -1,7 +1,9 @@
-# Exclude legacy backend/python files from static deployment
+# Exclude Python files, scripts, and the Express server from deployment
 api/**/*.py
 scripts/
-requirements.txt
 server/
-*.py
-!api/**/*.js
+requirements.txt
+process_event.py
+trigger action/
+*.pyc
+__pycache__/
