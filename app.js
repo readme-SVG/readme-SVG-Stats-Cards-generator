@@ -343,15 +343,39 @@ function render() {
       `${svgEl.getAttribute('width')} × ${svgEl.getAttribute('height')} px`;
   }
 
-  /* Markdown output — use file path instead of data URI (GitHub blocks data URIs) */
+  /* Markdown output — API endpoint renders badge with current state params */
   const label = state.label || 'label';
-  const alt   = `${label} badge`;
-  const slug  = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const fname = `badge-${slug}.svg`;
-  document.getElementById('outputMarkdown').value = `![${alt}](${fname})\n\n<!-- Download the SVG file, commit it to your repo, and reference by path -->\n<!-- Example with subdirectory: ![${alt}](assets/badges/${fname}) -->`;
+  const value = state.value || 'value';
+  const alt   = `${label}: ${value}`;
+  const apiUrl = new URL('/api/badge', window.location.origin);
+  const query = apiUrl.searchParams;
+
+  query.set('label', label);
+  query.set('value', value);
+  query.set('style', state.style || 'flat');
+  query.set('theme', state.theme || 'dark');
+  query.set('size', state.size || 'md');
+  query.set('icon', state.icon || 'none');
+  query.set('scale', String(state.scale ?? 1));
+
+  if (state.iconData) query.set('iconData', state.iconData);
+  if (state.labelBg) query.set('labelBg', state.labelBg);
+  if (state.valueBg) query.set('valueBg', state.valueBg);
+  if (state.labelColor) query.set('labelColor', state.labelColor);
+  if (state.valueColor) query.set('valueColor', state.valueColor);
+  if (state.borderColor) query.set('borderColor', state.borderColor);
+  if (state.borderRadius !== null && state.borderRadius !== undefined) {
+    query.set('borderRadius', String(state.borderRadius));
+  }
+  if (state.gradient) query.set('gradient', '1');
+  if (state.uppercase) query.set('uppercase', '1');
+  if (state.compact) query.set('compact', '1');
+
+  const markdownUrl = apiUrl.toString();
+  document.getElementById('outputMarkdown').value = `![${alt}](${markdownUrl})`;
 
   /* HTML <img> output */
-  document.getElementById('outputHtml').value = `<img src="${fname}" alt="${alt}" />`;
+  document.getElementById('outputHtml').value = `<img src="${markdownUrl}" alt="${alt}" />`;
 
   /* SVG output */
   document.getElementById('outputSvg').value = svg;
