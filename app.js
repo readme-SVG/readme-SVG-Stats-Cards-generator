@@ -343,13 +343,34 @@ function render() {
       `${svgEl.getAttribute('width')} × ${svgEl.getAttribute('height')} px`;
   }
 
-  /* Markdown output — API endpoint returns animated SVG for README embeds */
-  const label = state.label || 'Animated ASCII';
-  const alt   = `${label} animated ascii`;
+  /* Markdown output — API endpoint renders badge with current state params */
+  const label = state.label || 'label';
+  const value = state.value || 'value';
+  const alt   = `${label}: ${value}`;
   const apiUrl = new URL('/api/badge', window.location.origin);
-  apiUrl.searchParams.set('label', label);
-  apiUrl.searchParams.set('theme', state.theme || 'dark');
-  apiUrl.searchParams.set('profile', state.value || 'donut');
+  const query = apiUrl.searchParams;
+
+  query.set('label', label);
+  query.set('value', value);
+  query.set('style', state.style || 'flat');
+  query.set('theme', state.theme || 'dark');
+  query.set('size', state.size || 'md');
+  query.set('icon', state.icon || 'none');
+  query.set('scale', String(state.scale ?? 1));
+
+  if (state.iconData) query.set('iconData', state.iconData);
+  if (state.labelBg) query.set('labelBg', state.labelBg);
+  if (state.valueBg) query.set('valueBg', state.valueBg);
+  if (state.labelColor) query.set('labelColor', state.labelColor);
+  if (state.valueColor) query.set('valueColor', state.valueColor);
+  if (state.borderColor) query.set('borderColor', state.borderColor);
+  if (state.borderRadius !== null && state.borderRadius !== undefined) {
+    query.set('borderRadius', String(state.borderRadius));
+  }
+  if (state.gradient) query.set('gradient', '1');
+  if (state.uppercase) query.set('uppercase', '1');
+  if (state.compact) query.set('compact', '1');
+
   const markdownUrl = apiUrl.toString();
   document.getElementById('outputMarkdown').value = `![${alt}](${markdownUrl})`;
 
